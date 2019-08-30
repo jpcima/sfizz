@@ -28,8 +28,6 @@ if (WIN32)
     # add_compile_options(/fp:fast)
 endif()
 
-message("Cmake flags: ${CMAKE_CXX_FLAGS}")
-
 # Check SIMD
 set(USE_SIMD OFF)
 include(CheckIncludeFiles)
@@ -84,18 +82,25 @@ set(SSE_SOURCES
 if (HAVE_X86INTRIN_H AND UNIX)
     add_compile_options(-DHAVE_X86INTRIN_H)
     add_compile_options(-DUSE_SIMD)
-    set(COMMON_SOURCES ${COMMON_SOURCES} sources/SIMDSSE.cpp)
+    set(SIMD_SOURCES sources/SIMDSSE.cpp)
 elseif (HAVE_INTRIN_H AND WIN32)
     add_compile_options(/DHAVE_INTRIN_H)
     add_compile_options(/DUSE_SIMD)
-    set(COMMON_SOURCES ${COMMON_SOURCES} sources/SIMDSSE.cpp)
+    set(SIMD_SOURCES sources/SIMDSSE.cpp)
 elseif (HAVE_ARM_NEON_H AND UNIX)
     add_compile_options(-DUSE_SIMD)
     add_compile_options(-DHAVE_ARM_NEON_H)
-    set(COMMON_SOURCES ${COMMON_SOURCES} sources/SIMDDummy.cpp)
+    add_compile_options(-mfpu=neon-fp-armv8)
+    add_compile_options(-march=native)
+    add_compile_options(-mtune=cortex-a53)
+    add_compile_options(-funsafe-math-optimizations)
+    set(SIMD_SOURCES sources/SIMDNEON.cpp)
+    # set(SIMD_SOURCES sources/SIMDDummy.cpp)
 else()
-    set(COMMON_SOURCES ${COMMON_SOURCES} sources/SIMDDummy.cpp)
+    set(SIMD_SOURCES sources/SIMDDummy.cpp)
 endif()
+set(COMMON_SOURCES ${COMMON_SOURCES} ${SIMD_SOURCES})
+message("Cmake flags: ${CMAKE_CXX_FLAGS}")
     
 set(TEST_SOURCES
     tests/RegexT.cpp
@@ -130,7 +135,7 @@ add_executable(sfizz sources/Main.cpp ${COMMON_SOURCES})
 # Per OS properties
 if(UNIX)
     target_compile_options(sfizz PRIVATE -fno-rtti -fno-exceptions)
-    target_link_libraries(sfizz stdc++fs)
+    target_link_libraries(sfizz stdc++fs atomic)
 endif(UNIX)
 target_link_libraries(sfizz jack absl::strings sndfile absl::flat_hash_map readerwriterqueue absl::flags_parse)
 
@@ -139,7 +144,7 @@ target_link_libraries(sfizz jack absl::strings sndfile absl::flat_hash_map reade
 add_executable(sfizz_tests ${TEST_SOURCES} ${COMMON_SOURCES})
 # Per OS properties
 if(UNIX)
-    target_link_libraries(sfizz_tests stdc++fs)
+    target_link_libraries(sfizz_tests stdc++fs atomic)
 endif(UNIX)
 target_link_libraries(sfizz_tests Catch2::Catch2 absl::strings absl::str_format absl::flat_hash_map sndfile readerwriterqueue cnpy-static absl::span absl::algorithm)
 target_include_directories(sfizz_tests SYSTEM PRIVATE sources)
@@ -149,32 +154,32 @@ file(COPY "tests" DESTINATION ${CMAKE_BINARY_DIR})
 add_executable(bm_opf_high_vs_low benchmarks/BM_OPF_high_vs_low.cpp)
 target_link_libraries(bm_opf_high_vs_low benchmark absl::span)
 
-add_executable(bm_write benchmarks/BM_writeInterleaved.cpp sources/SIMDSSE.cpp)
+add_executable(bm_write benchmarks/BM_writeInterleaved.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_write benchmark absl::span)
 
-add_executable(bm_read benchmarks/BM_readInterleaved.cpp sources/SIMDSSE.cpp)
+add_executable(bm_read benchmarks/BM_readInterleaved.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_read benchmark absl::span)
 
-add_executable(bm_fill benchmarks/BM_fill.cpp sources/SIMDSSE.cpp)
+add_executable(bm_fill benchmarks/BM_fill.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_fill benchmark absl::span)
 
-add_executable(bm_mathfuns benchmarks/BM_mathfuns.cpp sources/SIMDSSE.cpp)
+add_executable(bm_mathfuns benchmarks/BM_mathfuns.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_mathfuns benchmark absl::span)
 
-add_executable(bm_gain benchmarks/BM_gain.cpp sources/SIMDSSE.cpp)
+add_executable(bm_gain benchmarks/BM_gain.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_gain benchmark absl::span)
 
-add_executable(bm_looping benchmarks/BM_looping.cpp sources/SIMDSSE.cpp)
+add_executable(bm_looping benchmarks/BM_looping.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_looping benchmark absl::span absl::algorithm)
 
-add_executable(bm_saturating benchmarks/BM_saturating.cpp sources/SIMDSSE.cpp)
+add_executable(bm_saturating benchmarks/BM_saturating.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_saturating benchmark absl::span absl::algorithm)
 
-add_executable(bm_ramp benchmarks/BM_ramp.cpp sources/SIMDSSE.cpp)
+add_executable(bm_ramp benchmarks/BM_ramp.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_ramp benchmark absl::span absl::algorithm)
 
-add_executable(bm_ADSR benchmarks/BM_ADSR.cpp sources/SIMDSSE.cpp)
+add_executable(bm_ADSR benchmarks/BM_ADSR.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_ADSR benchmark absl::span absl::algorithm)
 
-add_executable(bm_add benchmarks/BM_add.cpp sources/SIMDSSE.cpp)
+add_executable(bm_add benchmarks/BM_add.cpp ${SIMD_SOURCES})
 target_link_libraries(bm_add benchmark absl::span absl::algorithm)
