@@ -28,9 +28,9 @@ namespace sfz {
 namespace config {
     constexpr float defaultSampleRate { 48000 };
     constexpr int defaultSamplesPerBlock { 1024 };
-    constexpr int preloadSize { 8192 };
+    constexpr int preloadSize { 8192 * 4 };
     constexpr int numChannels { 2 };
-    constexpr int numVoices { 64 };
+    constexpr int numVoices { 32 };
     constexpr int numLoadingThreads { 4 };
     constexpr int centPerSemitone { 100 };
     constexpr float virtuallyZero { 0.00005f };

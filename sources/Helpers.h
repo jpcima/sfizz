@@ -22,7 +22,6 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#include <bits/stdint-uintn.h>
 #include <cstdint>
 #include <random>
 #include <signal.h>
@@ -89,8 +88,9 @@ inline constexpr T min(T op1, T op2, T op3, T op4) { return std::min(op1, std::m
 // #define ASSERTFALSE { raise(SIGTRAP); }
 #define ASSERTFALSE      \
     {                    \
-        __asm__("int3"); \
+        __builtin_trap(); \
     }
+    //__asm__("int3");
 #elif _WIN32 || _WIN64
 #pragma intrinsic(__debugbreak)
 #define ASSERTFALSE     \
@@ -213,11 +213,8 @@ public:
         _mm_setcsr((registerState & (~mask)) | mask);
 #elif HAVE_ARM_NEON_H
         intptr_t mask = (1 << 24);
-        asm volatile("vmrs %0, fpscr"
-                     : "=r"(registerState));
-        asm volatile("vmsr fpscr, %0"
-                     :
-                     : "ri"((registerState & (~mask)) | mask));
+        asm volatile("vmrs %0, fpscr" : "=r" (registerState));
+        asm volatile("vmsr fpscr, %0" : : "ri" ((registerState & (~mask)) | mask));
 #endif
     }
     ~ScopedFTZ()
@@ -225,8 +222,7 @@ public:
 #if (HAVE_X86INTRIN_H || HAVE_INTRIN_H)
         _mm_setcsr(registerState);
 #elif HAVE_ARM_NEON_H
-        asm volatile("vmsr %0, fpscr"
-                     : "=r"(registerState));
+        asm volatile("vmsr fpscr, %0" : : "ri" (registerState));
 #endif
     }
 
