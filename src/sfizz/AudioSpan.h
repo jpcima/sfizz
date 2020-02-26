@@ -307,6 +307,29 @@ public:
     }
 
     /**
+     * @brief Add another AudioSpan with a compatible number of channels to the current
+     * AudioSpan, multiplied by a fixed gain.
+     *
+     * @param other the other AudioSpan
+     */
+    template <class U, size_t N, typename = std::enable_if<N <= MaxChannels>>
+    void addMultiplied(AudioSpan<U, N>& other, U gain)
+    {
+        static_assert(!std::is_const<Type>::value, "Can't allow mutating operations on const AudioSpans");
+        ASSERT(other.getNumChannels() == numChannels);
+        if (other.getNumChannels() == numChannels) {
+            for (size_t i = 0; i < numChannels; ++i) {
+                // sfz::add<Type>(other.getConstSpan(i), getSpan(i));
+                #pragma message("TODO(jpc) implement this correctly")
+                U* dst = spans[i];
+                const U* src = other.spans[i];
+                for (size_t f = 0, numFrames = getNumFrames(); f < numFrames; ++f)
+                    dst[f] += gain * src[f];
+            }
+        }
+    }
+
+    /**
      * @brief Copy the elements of another AudioSpan with a compatible number of channels
      * to the current AudioSpan.
      *
