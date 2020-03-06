@@ -19,7 +19,7 @@ if (NOT EXISTS "${VST3SDK_BASEDIR}")
 
     execute_process (
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/external"
-        COMMAND "${CMAKE_COMMAND}" -E tar xvf "../download/${VST3SDK_ARCHIVE}"
+        COMMAND "${CMAKE_COMMAND}" -E tar xf "../download/${VST3SDK_ARCHIVE}"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external")
 endif()
 
@@ -99,7 +99,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         "-Wno-ignored-qualifiers"
         "-Wno-unused-function"
         "-Wno-unused-parameter"
-        "-Wno-unused-variable")
+        "-Wno-unused-variable"
+        "-Wunknown-warning-option")
 endif()
 
 # To help debugging the link only

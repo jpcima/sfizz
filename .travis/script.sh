@@ -23,7 +23,7 @@ elif [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
   buildenv make -j$(nproc)
 elif [[ ${TRAVIS_OS_NAME} == "osx" ]]; then
 
-  buildenv cmake -DCMAKE_BUILD_TYPE=Release -DSFIZZ_TESTS=OFF ..
+  buildenv cmake -DCMAKE_BUILD_TYPE=Release -DSFIZZ_TESTS=OFF -DSFIZZ_VST=ON ..
   buildenv make -j$(sysctl -n hw.ncpu)
 
 # Xcode not currently supported, see https://gitlab.kitware.com/cmake/cmake/issues/18088
