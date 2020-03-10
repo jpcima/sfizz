@@ -37,8 +37,8 @@ jobs:
   - name: "Windows mingw32"
     stage: "Build"
     env:
+    - CONTAINER=archlinux
     - CROSS_COMPILE=mingw32
-    - CONTAINER=cross
     - INSTALL_DIR="sfizz-${TRAVIS_BRANCH}-mingw32"
     before_install: .travis/before_install_mingw.sh
     install: .travis/install_mingw.sh
@@ -47,8 +47,8 @@ jobs:
 
   - name: "Windows mingw64"
     env:
+    - CONTAINER=archlinux
     - CROSS_COMPILE=mingw64
-    - CONTAINER=cross
     - INSTALL_DIR="sfizz-${TRAVIS_BRANCH}-mingw64"
     before_install: .travis/before_install_mingw.sh
     install: .travis/install_mingw.sh
@@ -117,6 +117,17 @@ jobs:
     - INSTALL_DIR="sfizz-${TRAVIS_BRANCH}-${TRAVIS_OS_NAME}-${TRAVIS_CPU_ARCH}"
     install: .travis/install_osx.sh
     script: .travis/script_osx.sh
+    after_success: .travis/prepare_tarball.sh
+
+  - name: "MOD devices arm"
+    stage: "Build"
+    env:
+    - CONTAINER=jpcima/mod-plugin-builder
+    - CROSS_COMPILE=moddevices-arm
+    - INSTALL_DIR="sfizz-${TRAVIS_BRANCH}-moddevices"
+    before_install: .travis/before_install_moddevices.sh
+    install: .travis/install_moddevices.sh
+    script: .travis/script_moddevices.sh
     after_success: .travis/prepare_tarball.sh
 
   - stage: "Deploy"
