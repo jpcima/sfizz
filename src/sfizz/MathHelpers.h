@@ -174,6 +174,11 @@ constexpr Type sqrtTwo() { return static_cast<Type>(1.41421356237309504880168872
 template <class Type>
 constexpr Type sqrtTwoInv() { return static_cast<Type>(0.707106781186547524400844362104849039284835937688474036588); };
 
+constexpr unsigned int mask(int x)
+{
+    return (1U << x) - 1;
+}
+
 /**
    @brief A fraction which is parameterized by integer type
  */
@@ -339,6 +344,65 @@ bool isValidAudio(absl::Span<Type> span)
 
     return true;
 }
+
+/**
+ * @brief Finds the minimum size of 2 spans
+ *
+ * @tparam T
+ * @tparam U
+ * @param span1
+ * @param span2
+ * @return constexpr size_t
+ */
+template <class T, class U>
+constexpr size_t minSpanSize(absl::Span<T>& span1, absl::Span<U>& span2)
+{
+    return min(span1.size(), span2.size());
+}
+
+/**
+ * @brief Finds the minimum size of a list of spans.
+ *
+ * @tparam T
+ * @tparam Others
+ * @param first
+ * @param others
+ * @return constexpr size_t
+ */
+template <class T, class... Others>
+constexpr size_t minSpanSize(absl::Span<T>& first, Others... others)
+{
+    return min(first.size(), minSpanSize(others...));
+}
+
+template <class T>
+constexpr bool _checkSpanSizes(size_t size, absl::Span<T>& span1)
+{
+    return span1.size() == size;
+}
+
+template <class T, class... Others>
+constexpr bool _checkSpanSizes(size_t size, absl::Span<T>& span1, Others... others)
+{
+    return span1.size() == size && _checkSpanSizes(size, others...);
+}
+
+/**
+ * @brief Check that all spans of a compile time list have the same size
+ *
+ * @tparam T
+ * @tparam Others
+ * @param first
+ * @param others
+ * @return constexpr size_t
+ */
+template <class T, class... Others>
+constexpr bool checkSpanSizes(const absl::Span<T>& span1, Others... others)
+{
+    return _checkSpanSizes(span1.size(), others...);
+}
+
+#define CHECK_SPAN_SIZES(...) ASSERT(checkSpanSizes(__VA_ARGS__))
 
 class ScopedRoundingMode {
 public:

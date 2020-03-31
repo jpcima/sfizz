@@ -17,13 +17,12 @@
 #include "absl/meta/type_traits.h"
 #include "Defaults.h"
 
-namespace sfz
-{
+namespace sfz {
 
 using CCNamePair = std::pair<uint16_t, std::string>;
 template <class T>
 using MidiNoteArray = std::array<T, 128>;
-template<class ValueType>
+template <class ValueType>
 struct CCData {
     int cc;
     ValueType data;
@@ -38,7 +37,7 @@ struct Modifier {
     static_assert(config::maxCurves - 1 <= std::numeric_limits<decltype(curve)>::max(), "The curve type in the Modifier struct cannot support the required number of curves");
 };
 
-template<class ValueType>
+template <class ValueType>
 struct CCDataComparator {
     bool operator()(const CCData<ValueType>& ccData, const int& cc)
     {
@@ -104,13 +103,13 @@ struct MidiEventValueComparator {
  * @param centsPerOctave
  * @return constexpr float
  */
-template<class T>
+template <class T>
 constexpr float centsFactor(T cents, T centsPerOctave = 1200)
 {
     return std::pow(2.0f, static_cast<float>(cents) / centsPerOctave);
 }
 
-template<class T, absl::enable_if_t<std::is_integral<T>::value, int> = 0>
+template <class T, absl::enable_if_t<std::is_integral<T>::value, int> = 0>
 constexpr T denormalize7Bits(float value)
 {
     return static_cast<T>(value * 127.0f);
@@ -126,10 +125,10 @@ constexpr uint8_t denormalizeVelocity(float value)
     return denormalize7Bits<uint8_t>(value);
 }
 
-template<class T>
+template <class T>
 constexpr float normalize7Bits(T value)
 {
-    return static_cast<float>(min(max(value, T{ 0 }), T{ 127 })) / 127.0f;
+    return static_cast<float>(min(max(value, T { 0 }), T { 127 })) / 127.0f;
 }
 
 /**
@@ -139,7 +138,7 @@ constexpr float normalize7Bits(T value)
  * @param ccValue
  * @return constexpr float
  */
-template<class T>
+template <class T>
 constexpr float normalizeCC(T ccValue)
 {
     return normalize7Bits(ccValue);
@@ -152,12 +151,11 @@ constexpr float normalizeCC(T ccValue)
  * @param ccValue
  * @return constexpr float
  */
-template<class T>
+template <class T>
 constexpr float normalizeVelocity(T velocity)
 {
     return normalize7Bits(velocity);
 }
-
 
 /**
  * @brief Normalize a percentage between 0 and 1
@@ -166,7 +164,7 @@ constexpr float normalizeVelocity(T velocity)
  * @param percentValue
  * @return constexpr float
  */
-template<class T>
+template <class T>
 constexpr float normalizePercents(T percentValue)
 {
     return percentValue * 0.01f;
@@ -192,6 +190,12 @@ namespace literals {
 
         return normalize7Bits(value);
     }
+}
+
+template <class Type>
+inline CXX14_CONSTEXPR Type vaGain(Type cutoff, Type sampleRate)
+{
+    return std::tan(cutoff / sampleRate  * pi<Type>());
 }
 
 /**
@@ -265,4 +269,3 @@ bool findDefine(absl::string_view line, absl::string_view& variable, absl::strin
 bool findInclude(absl::string_view line, std::string& path);
 
 } // namespace sfz
-

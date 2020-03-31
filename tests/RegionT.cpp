@@ -480,7 +480,7 @@ TEST_CASE("[Region] Parsing opcodes")
         region.parseOpcode({ "pan_smoothcc14", "85" });
         REQUIRE(region.panCC[14].smooth == 85);
         region.parseOpcode({ "pan_smoothcc14", "15482" });
-        REQUIRE(region.panCC[14].smooth == 127);
+        REQUIRE(region.panCC[14].smooth == 100);
         region.parseOpcode({ "pan_smoothcc14", "-2" });
         REQUIRE(region.panCC[14].smooth == 0);
         region.parseOpcode({ "pan_stepcc120", "24" });
@@ -519,7 +519,7 @@ TEST_CASE("[Region] Parsing opcodes")
         region.parseOpcode({ "width_smoothcc14", "85" });
         REQUIRE(region.widthCC[14].smooth == 85);
         region.parseOpcode({ "width_smoothcc14", "15482" });
-        REQUIRE(region.widthCC[14].smooth == 127);
+        REQUIRE(region.widthCC[14].smooth == 100);
         region.parseOpcode({ "width_smoothcc14", "-2" });
         REQUIRE(region.widthCC[14].smooth == 0);
         region.parseOpcode({ "width_stepcc120", "24" });
@@ -558,7 +558,7 @@ TEST_CASE("[Region] Parsing opcodes")
         region.parseOpcode({ "position_smoothcc14", "85" });
         REQUIRE(region.positionCC[14].smooth == 85);
         region.parseOpcode({ "position_smoothcc14", "15482" });
-        REQUIRE(region.positionCC[14].smooth == 127);
+        REQUIRE(region.positionCC[14].smooth == 100);
         region.parseOpcode({ "position_smoothcc14", "-2" });
         REQUIRE(region.positionCC[14].smooth == 0);
         region.parseOpcode({ "position_stepcc120", "24" });
@@ -1515,7 +1515,7 @@ TEST_CASE("[Region] Parsing opcodes")
         region.parseOpcode({ "amplitude_smoothcc14", "85" });
         REQUIRE(region.amplitudeCC[14].smooth == 85);
         region.parseOpcode({ "amplitude_smoothcc14", "15482" });
-        REQUIRE(region.amplitudeCC[14].smooth == 127);
+        REQUIRE(region.amplitudeCC[14].smooth == 100);
         region.parseOpcode({ "amplitude_smoothcc14", "-2" });
         REQUIRE(region.amplitudeCC[14].smooth == 0);
         region.parseOpcode({ "amplitude_stepcc120", "24" });
@@ -1547,7 +1547,7 @@ TEST_CASE("[Region] Parsing opcodes")
         region.parseOpcode({ "volume_smoothcc14", "85" });
         REQUIRE(region.volumeCC[14].smooth == 85);
         region.parseOpcode({ "volume_smoothcc14", "15482" });
-        REQUIRE(region.volumeCC[14].smooth == 127);
+        REQUIRE(region.volumeCC[14].smooth == 100);
         region.parseOpcode({ "volume_smoothcc14", "-2" });
         REQUIRE(region.volumeCC[14].smooth == 0);
         region.parseOpcode({ "volume_stepcc120", "24" });
@@ -1579,7 +1579,7 @@ TEST_CASE("[Region] Parsing opcodes")
         region.parseOpcode({ "pitch_smoothcc14", "85" });
         REQUIRE(region.tuneCC[14].smooth == 85);
         region.parseOpcode({ "tune_smoothcc14", "15482" });
-        REQUIRE(region.tuneCC[14].smooth == 127);
+        REQUIRE(region.tuneCC[14].smooth == 100);
         region.parseOpcode({ "pitch_smoothcc14", "-2" });
         REQUIRE(region.tuneCC[14].smooth == 0);
         region.parseOpcode({ "tune_stepcc120", "24" });

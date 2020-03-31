@@ -16,7 +16,7 @@ set(SFIZZ_TEST_SOURCES
     SIMDHelpersT.cpp
     FilesT.cpp
     MidiStateT.cpp
-    OnePoleFilterT.cpp
+    SmoothersT.cpp
     RegionActivationT.cpp
     RegionValueComputationsT.cpp
     # If we're tweaking the curves this kind of tests does not make sense
