@@ -7,6 +7,7 @@
 #include "SIMDHelpers.h"
 #include "OnePoleFilter.h"
 #include "SfzFilter.h"
+#include "SfzHelpers.h"
 #include "ScopedFTZ.h"
 #include <benchmark/benchmark.h>
 #include <random>
@@ -57,7 +58,7 @@ BENCHMARK_DEFINE_F(FilterFixture, OnePole_VA)(benchmark::State& state) {
         const auto sentinel = cutoff.data() + blockSize;
         while (cutoffPtr < sentinel)
         {
-            const auto gain = sfz::OnePoleFilter<float>::normalizedGain(*cutoffPtr, sampleRate);
+            const auto gain = sfz::vaGain(*cutoffPtr, sampleRate);
             filter.setGain(gain);
             filter.processLowpass({ inputPtr, step }, { outputPtr, step } );
             cutoffPtr += step;

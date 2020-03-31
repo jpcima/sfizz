@@ -83,7 +83,8 @@ namespace Default
 	constexpr Range<uint8_t> channelRange { 1, 16 };
 	constexpr Range<uint8_t> midiChannelRange { 0, 15 };
     constexpr Range<uint8_t> stepCCRange { 0, 127 };
-    constexpr Range<uint8_t> smoothCCRange { 0, 127 };
+    constexpr Range<uint8_t> smoothCCRange { 0, 100 };
+    constexpr float smoothTauPerStep { 3e-3 };
     constexpr Range<uint8_t> curveCCRange { 0, 255 };
     constexpr Range<uint16_t> ccNumberRange { 0, config::numCCs };
     constexpr auto ccValueRange = normalizedRange;
@@ -207,6 +208,7 @@ namespace Default
     constexpr int bendUp { 200 }; // No range here because the bounds can be inverted
     constexpr int bendDown { -200 };
     constexpr int bendStep { 1 };
+    constexpr uint8_t bendSmooth { 0 };
 
     // Envelope generators
 	constexpr float attack { 0 };

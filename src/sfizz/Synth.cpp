@@ -9,6 +9,7 @@
 #include "Debug.h"
 #include "Macros.h"
 #include "MidiState.h"
+#include "ModifierHelpers.h"
 #include "ScopedFTZ.h"
 #include "StringViewHelpers.h"
 #include "pugixml.hpp"
@@ -339,6 +340,7 @@ bool sfz::Synth::loadSfzFile(const fs::path& file)
 
     size_t maxFilters { 0 };
     size_t maxEQs { 0 };
+    ModifierArray<size_t> maxModifiers { 0 };
 
     while (currentRegion < lastRegion.base()) {
         auto region = currentRegion->get();
@@ -440,6 +442,8 @@ bool sfz::Synth::loadSfzFile(const fs::path& file)
         region->registerTempo(2.0f);
         maxFilters = max(maxFilters, region->filters.size());
         maxEQs = max(maxEQs, region->equalizers.size());
+        for (const auto& mod : allModifiers)
+            maxModifiers[mod] = max(maxModifiers[mod], region->modifiers[mod].size());
 
         ++currentRegion;
     }
@@ -451,6 +455,7 @@ bool sfz::Synth::loadSfzFile(const fs::path& file)
     for (auto& voice : voices) {
         voice->setMaxFiltersPerVoice(maxFilters);
         voice->setMaxEQsPerVoice(maxEQs);
+        voice->prepareSmoothers(maxModifiers);
     }
 
     return true;
@@ -629,8 +634,8 @@ void sfz::Synth::renderBlock(AudioSpan<float> buffer) noexcept
 
     ASSERT(!hasNanInf(buffer.getConstSpan(0)));
     ASSERT(!hasNanInf(buffer.getConstSpan(1)));
-    ASSERT(isValidAudio(buffer.getConstSpan(0)));
-    ASSERT(isValidAudio(buffer.getConstSpan(1)));
+    ASSERT(isReasonable(buffer.getConstSpan(0)));
+    ASSERT(isReasonable(buffer.getConstSpan(1)));
 }
 
 void sfz::Synth::noteOn(int delay, int noteNumber, uint8_t velocity) noexcept

@@ -309,19 +309,19 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::curveCCRange))
-            volumeCC[opcode.parameters.back()].curve = *value;
+            modifiers[Mod::volume][opcode.parameters.back()].curve = *value;
         break;
     case hash("volume_stepcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::volumeStepRange))
-            volumeCC[opcode.parameters.back()].step = *value;
+            modifiers[Mod::volume][opcode.parameters.back()].step = *value;
         break;
     case hash("volume_smoothcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::smoothCCRange))
-            volumeCC[opcode.parameters.back()].smooth = *value;
+            modifiers[Mod::volume][opcode.parameters.back()].smooth = *value;
         break;
     case hash("gain_cc&"):
     case hash("gain_oncc&"): // fallthrough
@@ -329,7 +329,7 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::volumeCCRange))
-            volumeCC[opcode.parameters.back()].value = *value;
+            modifiers[Mod::volume][opcode.parameters.back()].value = *value;
         break;
     case hash("amplitude"):
         if (auto value = readOpcode(opcode.value, Default::amplitudeRange))
@@ -339,26 +339,26 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::curveCCRange))
-            amplitudeCC[opcode.parameters.back()].curve = *value;
+            modifiers[Mod::amplitude][opcode.parameters.back()].curve = *value;
         break;
     case hash("amplitude_stepcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::amplitudeRange))
-            amplitudeCC[opcode.parameters.back()].step = normalizePercents(*value);
+            modifiers[Mod::amplitude][opcode.parameters.back()].step = normalizePercents(*value);
         break;
     case hash("amplitude_smoothcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::smoothCCRange))
-            amplitudeCC[opcode.parameters.back()].smooth = *value;
+            modifiers[Mod::amplitude][opcode.parameters.back()].smooth = *value;
         break;
     case hash("amplitude_cc&"): // fallthrough
     case hash("amplitude_oncc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::amplitudeRange))
-            amplitudeCC[opcode.parameters.back()].value = normalizePercents(*value);
+            modifiers[Mod::amplitude][opcode.parameters.back()].value = normalizePercents(*value);
         break;
     case hash("pan"):
         if (auto value = readOpcode(opcode.value, Default::panRange))
@@ -368,26 +368,26 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::curveCCRange))
-            panCC[opcode.parameters.back()].curve = *value;
+            modifiers[Mod::pan][opcode.parameters.back()].curve = *value;
         break;
     case hash("pan_stepcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::panStepRange))
-            panCC[opcode.parameters.back()].step = normalizePercents(*value);
+            modifiers[Mod::pan][opcode.parameters.back()].step = normalizePercents(*value);
         break;
     case hash("pan_smoothcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::smoothCCRange))
-            panCC[opcode.parameters.back()].smooth = *value;
+            modifiers[Mod::pan][opcode.parameters.back()].smooth = *value;
         break;
     case hash("pan_cc&"):
     case hash("pan_oncc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::panCCRange))
-            panCC[opcode.parameters.back()].value = normalizePercents(*value);
+            modifiers[Mod::pan][opcode.parameters.back()].value = normalizePercents(*value);
         break;
     case hash("position"):
         if (auto value = readOpcode(opcode.value, Default::positionRange))
@@ -397,26 +397,26 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::curveCCRange))
-            positionCC[opcode.parameters.back()].curve = *value;
+            modifiers[Mod::position][opcode.parameters.back()].curve = *value;
         break;
     case hash("position_stepcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::positionStepRange))
-            positionCC[opcode.parameters.back()].step = normalizePercents(*value);
+            modifiers[Mod::position][opcode.parameters.back()].step = normalizePercents(*value);
         break;
     case hash("position_smoothcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::smoothCCRange))
-            positionCC[opcode.parameters.back()].smooth = *value;
+            modifiers[Mod::position][opcode.parameters.back()].smooth = *value;
         break;
     case hash("position_cc&"): // fallthrough
     case hash("position_oncc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::positionCCRange))
-            positionCC[opcode.parameters.back()].value = normalizePercents(*value);
+            modifiers[Mod::position][opcode.parameters.back()].value = normalizePercents(*value);
         break;
     case hash("width"):
         if (auto value = readOpcode(opcode.value, Default::widthRange))
@@ -426,25 +426,25 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::curveCCRange))
-            widthCC[opcode.parameters.back()].curve = *value;
+            modifiers[Mod::width][opcode.parameters.back()].curve = *value;
         break;
     case hash("width_stepcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::widthStepRange))
-            widthCC[opcode.parameters.back()].step = normalizePercents(*value);
+            modifiers[Mod::width][opcode.parameters.back()].step = normalizePercents(*value);
         break;
     case hash("width_smoothcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::smoothCCRange))
-            widthCC[opcode.parameters.back()].smooth = *value;
+            modifiers[Mod::width][opcode.parameters.back()].smooth = *value;
         break;
     case hash("width_oncc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::widthCCRange))
-            widthCC[opcode.parameters.back()].value = normalizePercents(*value);
+            modifiers[Mod::width][opcode.parameters.back()].value = normalizePercents(*value);
         break;
     case hash("amp_keycenter"):
         setValueFromOpcode(opcode, ampKeycenter, Default::keyRange);
@@ -830,21 +830,21 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::curveCCRange))
-            tuneCC[opcode.parameters.back()].curve = *value;
+            modifiers[Mod::pitch][opcode.parameters.back()].curve = *value;
         break;
     case hash("pitch_stepcc&"): // fallthrough
     case hash("tune_stepcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::tuneStepRange))
-            tuneCC[opcode.parameters.back()].step = *value;
+            modifiers[Mod::pitch][opcode.parameters.back()].step = *value;
         break;
     case hash("pitch_smoothcc&"): // fallthrough
     case hash("tune_smoothcc&"):
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::smoothCCRange))
-            tuneCC[opcode.parameters.back()].smooth = *value;
+            modifiers[Mod::pitch][opcode.parameters.back()].smooth = *value;
         break;
     case hash("tune_cc&"):
     case hash("tune_oncc&"):
@@ -853,7 +853,7 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::tuneCCRange))
-            tuneCC[opcode.parameters.back()].value = *value;
+            modifiers[Mod::pitch][opcode.parameters.back()].value = *value;
         break;
     case hash("bend_up"):
         setValueFromOpcode(opcode, bendUp, Default::bendBoundRange);
@@ -863,6 +863,9 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         break;
     case hash("bend_step"):
         setValueFromOpcode(opcode, bendStep, Default::bendStepRange);
+        break;
+    case hash("bend_smooth"):
+        setValueFromOpcode(opcode, bendSmooth, Default::smoothCCRange);
         break;
 
     // Amplitude Envelope
@@ -1304,4 +1307,10 @@ float sfz::Region::getGainToEffectBus(unsigned number) const noexcept
         return 0.0;
 
     return gainToEffect[number];
+}
+
+float sfz::Region::getBendInCents(float bend) const noexcept
+{
+    const auto bendInCents = bend > 0.0f ? bend * static_cast<float>(bendUp) : -bend * static_cast<float>(bendDown);
+    return centsFactor(bendInCents);
 }

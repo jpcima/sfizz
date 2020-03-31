@@ -135,6 +135,17 @@ BENCHMARK_DEFINE_F(MyFixture, SIMDCos)
     }
 }
 
+BENCHMARK_DEFINE_F(MyFixture, ScalarTan)
+(benchmark::State& state)
+{
+    for (auto _ : state) {
+        for (size_t i = 0, n = source.size(); i < n; ++i) {
+            result[i] = std::tan(source[i]);
+        }
+        benchmark::DoNotOptimize(result);
+    }
+}
+
 BENCHMARK_DEFINE_F(MyFixture, ScalarLibmFloorLog2)
 (benchmark::State& state)
 {
@@ -169,6 +180,7 @@ BENCHMARK_REGISTER_F(MyFixture, ScalarSin)->RangeMultiplier(4)->Range(1 << 6, 1 
 BENCHMARK_REGISTER_F(MyFixture, SIMDSin)->RangeMultiplier(4)->Range(1 << 6, 1 << 10);
 BENCHMARK_REGISTER_F(MyFixture, ScalarCos)->RangeMultiplier(4)->Range(1 << 6, 1 << 10);
 BENCHMARK_REGISTER_F(MyFixture, SIMDCos)->RangeMultiplier(4)->Range(1 << 6, 1 << 10);
+BENCHMARK_REGISTER_F(MyFixture, ScalarTan)->RangeMultiplier(4)->Range(1 << 6, 1 << 10);
 BENCHMARK_REGISTER_F(MyFixture, ScalarLibmFloorLog2)->RangeMultiplier(4)->Range(1 << 6, 1 << 10);
 BENCHMARK_REGISTER_F(MyFixture, ScalarFastFloorLog2)->RangeMultiplier(4)->Range(1 << 6, 1 << 10);
 
