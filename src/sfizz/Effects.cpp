@@ -16,6 +16,7 @@
 #include "effects/Lofi.h"
 #include "effects/Limiter.h"
 #include "effects/Strings.h"
+#include "effects/Phaser.h"
 #include "effects/Rectify.h"
 #include "effects/Gain.h"
 #include "effects/Width.h"
@@ -32,6 +33,7 @@ void EffectFactory::registerStandardEffectTypes()
     registerEffectType("lofi", fx::Lofi::makeInstance);
     registerEffectType("limiter", fx::Limiter::makeInstance);
     registerEffectType("strings", fx::Strings::makeInstance);
+    registerEffectType("phaser", fx::Phaser::makeInstance);
 
     // extensions (book)
     registerEffectType("rectify", fx::Rectify::makeInstance);

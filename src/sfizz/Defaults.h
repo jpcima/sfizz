@@ -223,5 +223,11 @@ namespace Default
     constexpr Range<float> apanFrequencyRange { 0, std::numeric_limits<float>::max() };
     constexpr Range<float> apanPhaseRange { 0.0, 360.0 };
     constexpr Range<float> apanLevelRange { 0.0, 100.0 };
+
+    constexpr Range<float> phaserLevelRange { 0.0f, 100.0f };
+    constexpr Range<float> phaserDepthRange { 0.0f, 100.0f };
+    constexpr Range<float> phaserFeedbackRange { 0.0f, 100.0f };
+    constexpr Range<int> phaserWaveformRange { 0, std::numeric_limits<int>::max() };
+    constexpr Range<float> phaserFrequencyRange { 0, std::numeric_limits<float>::max() };
 }
 }
