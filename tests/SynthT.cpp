@@ -398,3 +398,17 @@ TEST_CASE("[Synth] Not self-masking")
     REQUIRE(synth.getVoiceView(2)->getTriggerValue() == 64_norm);
     REQUIRE(!synth.getVoiceView(2)->canBeStolen());
 }
+
+TEST_CASE("[Synth] Basic curves")
+{
+    sfz::Synth synth;
+    const auto& curves = synth.getResources().curves;
+    synth.loadSfzFile(fs::current_path() / "tests/TestFiles/curves.sfz");
+    REQUIRE( synth.getNumCurves() == 19 );
+    REQUIRE( curves.getCurve(18).evalCC7(127) == 1.0f );
+    REQUIRE( curves.getCurve(18).evalCC7(95) == 0.5f );
+    REQUIRE( curves.getCurve(17).evalCC7(100) == 1.0f );
+    REQUIRE( curves.getCurve(17).evalCC7(95) == 0.5f );
+    // Default linear
+    REQUIRE( curves.getCurve(16).evalCC7(63) == Approx(63_norm) );
+}
