@@ -297,7 +297,7 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() > config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::volumeCCRange))
-            volumeCC[opcode.parameters.back()] = *value;
+            volumeCC[opcode.parameters.back()].value = *value;
         break;
     case hash("amplitude"):
         if (auto value = readOpcode(opcode.value, Default::amplitudeRange))
@@ -308,7 +308,7 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() > config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::amplitudeRange))
-            amplitudeCC[opcode.parameters.back()] = normalizePercents(*value);
+            amplitudeCC[opcode.parameters.back()].value = normalizePercents(*value);
         break;
     case hash("pan"):
         if (auto value = readOpcode(opcode.value, Default::panRange))
@@ -319,7 +319,7 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() > config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::panCCRange))
-            panCC[opcode.parameters.back()] = normalizePercents(*value);
+            panCC[opcode.parameters.back()].value = normalizePercents(*value);
         break;
     case hash("position"):
         if (auto value = readOpcode(opcode.value, Default::positionRange))
@@ -329,7 +329,7 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() > config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::positionCCRange))
-            positionCC[opcode.parameters.back()] = normalizePercents(*value);
+            positionCC[opcode.parameters.back()].value = normalizePercents(*value);
         break;
     case hash("width"):
         if (auto value = readOpcode(opcode.value, Default::widthRange))
@@ -339,7 +339,7 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() > config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::widthCCRange))
-            widthCC[opcode.parameters.back()] = normalizePercents(*value);
+            widthCC[opcode.parameters.back()].value = normalizePercents(*value);
         break;
     case hash("amp_keycenter"):
         setValueFromOpcode(opcode, ampKeycenter, Default::keyRange);
@@ -727,7 +727,7 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
         if (opcode.parameters.back() > config::numCCs)
             return false;
         if (auto value = readOpcode(opcode.value, Default::tuneCCRange))
-            tuneCC[opcode.parameters.back()] = *value;
+            tuneCC[opcode.parameters.back()].value = *value;
         break;
     case hash("bend_up"):
         setValueFromOpcode(opcode, bendUp, Default::bendBoundRange);
@@ -1072,15 +1072,15 @@ float sfz::Region::getCrossfadeGain() const noexcept
     float gain { 1.0f };
 
     // Crossfades due to CC states
-    for (const auto& valuePair : crossfadeCCInRange) {
-        const auto ccValue = midiState.getCCValue(valuePair.cc);
-        const auto crossfadeRange = valuePair.value;
+    for (const auto& ccData : crossfadeCCInRange) {
+        const auto ccValue = midiState.getCCValue(ccData.cc);
+        const auto crossfadeRange = ccData.data;
         gain *= crossfadeIn(crossfadeRange, ccValue, crossfadeCCCurve);
     }
 
-    for (const auto& valuePair : crossfadeCCOutRange) {
-        const auto ccValue = midiState.getCCValue(valuePair.cc);
-        const auto crossfadeRange = valuePair.value;
+    for (const auto& ccData : crossfadeCCOutRange) {
+        const auto ccValue = midiState.getCCValue(ccData.cc);
+        const auto crossfadeRange = ccData.data;
         gain *= crossfadeOut(crossfadeRange, ccValue, crossfadeCCCurve);
     }
 
