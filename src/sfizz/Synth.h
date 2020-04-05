@@ -338,7 +338,7 @@ public:
      */
     void disableFreeWheeling() noexcept;
 
-    const MidiState& getMidiState() const noexcept { return resources.midiState; }
+    const Resources& getResources() const noexcept { return resources; }
 
     /**
      * @brief Check if the SFZ should be reloaded.
