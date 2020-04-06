@@ -520,7 +520,6 @@ private:
 
     // Distribution used to generate random value for the *rand opcodes
     std::uniform_real_distribution<float> randNoteDistribution { 0, 1 };
-    unsigned fileTicket { 1 };
 
     // Atomic guards; must be used with AtomicGuard and AtomicDisabler
     std::atomic<bool> canEnterCallback { true };
