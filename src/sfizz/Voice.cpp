@@ -247,6 +247,51 @@ void sfz::Voice::renderBlock(AudioSpan<float> buffer) noexcept
 #endif
 }
 
+template<class F>
+void linearModifier(const sfz::Resources& resources, absl::Span<float> span, const sfz::CCData<sfz::Modifier>& ccData, F&& lambda)
+{
+    const auto events = resources.midiState.getCCEvents(ccData.cc);
+    const auto curve = resources.curves.getCurve(ccData.data.curve);
+    if (ccData.data.steps == 0) {
+        linearEnvelope(events, span, [&ccData, &curve, &lambda](float x) {
+            return lambda(curve.evalNormalized(x) * ccData.data.value);
+        });
+    } else {
+        const float stepSize { ccData.data.value / ccData.data.steps };
+        linearEnvelope(events, span, [&ccData, &curve, &lambda](float x) {
+            return lambda(curve.evalNormalized(x) * ccData.data.value);
+        }, stepSize);
+    }
+}
+
+template<class F>
+void multiplicativeModifier(const sfz::Resources& resources, absl::Span<float> span, const sfz::CCData<sfz::Modifier>& ccData, F&& lambda)
+{
+    const auto events = resources.midiState.getCCEvents(ccData.cc);
+    const auto curve = resources.curves.getCurve(ccData.data.curve);
+    if (ccData.data.steps == 0) {
+        multiplicativeEnvelope(events, span, [&ccData, &curve, &lambda](float x) {
+            return lambda(curve.evalNormalized(x) * ccData.data.value);
+        });
+    } else {
+        // FIXME: not sure about this step size for multiplicative envelopes
+        const float stepSize { ccData.data.value / ccData.data.steps };
+        multiplicativeEnvelope(events, span, [&ccData, &curve, &lambda](float x) {
+            return lambda(curve.evalNormalized(x) * ccData.data.value);
+        }, stepSize);
+    }
+}
+
+void linearModifier(const sfz::Resources& resources, absl::Span<float> span, const sfz::CCData<sfz::Modifier>& ccData)
+{
+    linearModifier(resources, span, ccData, [](float x) { return x; });
+}
+
+void multiplicativeModifier(const sfz::Resources& resources, absl::Span<float> span, const sfz::CCData<sfz::Modifier>& ccData)
+{
+    multiplicativeModifier(resources, span, ccData, [](float x) { return x; });
+}
+
 void sfz::Voice::amplitudeEnvelope(absl::Span<float> modulationSpan) noexcept
 {
     const auto numSamples = modulationSpan.size();
