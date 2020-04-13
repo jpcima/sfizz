@@ -21,6 +21,8 @@ sfz::Voice::Voice(sfz::Resources& resources)
 
     for (WavetableOscillator& osc : waveOscillators)
         osc.init(sampleRate);
+
+    gainSmoother.setSmoothing(config::gainSmoothing, sampleRate);
 }
 
 void sfz::Voice::startVoice(Region* region, int delay, int number, float value, sfz::Voice::TriggerType triggerType) noexcept
@@ -84,6 +86,7 @@ void sfz::Voice::startVoice(Region* region, int delay, int number, float value, 
     if (triggerType != TriggerType::CC)
         baseGain *= region->getNoteGain(number, value);
 
+    gainSmoother.reset(db2mag(baseVolumedB) * baseGain);
     // Check that we can handle the number of filters; filters should be cleared here
     ASSERT((filters.capacity() - filters.size()) >= region->filters.size());
     ASSERT((equalizers.capacity() - equalizers.size()) >= region->equalizers.size());
@@ -191,7 +194,7 @@ void sfz::Voice::registerTempo(int delay, float secondsPerQuarter) noexcept
 void sfz::Voice::setSampleRate(float sampleRate) noexcept
 {
     this->sampleRate = sampleRate;
-
+    gainSmoother.setSmoothing(config::gainSmoothing, sampleRate);
     for (WavetableOscillator& osc : waveOscillators)
         osc.init(sampleRate);
 }
@@ -290,6 +293,9 @@ void sfz::Voice::amplitudeEnvelope(absl::Span<float> modulationSpan) noexcept
         });
         applyGain<float>(*tempSpan, modulationSpan);
     }
+
+    // Smooth the gain transitions
+    gainSmoother.process(modulationSpan, modulationSpan);
 }
 
 void sfz::Voice::ampStageMono(AudioSpan<float> buffer) noexcept

@@ -11,6 +11,7 @@
 #include "Region.h"
 #include "AudioBuffer.h"
 #include "Resources.h"
+#include "Smoothers.h"
 #include "AudioSpan.h"
 #include "LeakDetector.h"
 #include "absl/types/span.h"
@@ -300,6 +301,7 @@ private:
 
     std::normal_distribution<float> noiseDist { 0, config::noiseVariance };
 
+    MultiplicativeSmoother gainSmoother;
     HistoricalBuffer<float> powerHistory { config::powerHistoryLength };
     LEAK_DETECTOR(Voice);
 };
