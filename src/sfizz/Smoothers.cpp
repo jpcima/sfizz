@@ -111,7 +111,8 @@ void MultiplicativeSmoother::setSmoothing(uint8_t smoothValue, float sampleRate)
 
 void MultiplicativeSmoother::reset(float value)
 {
-    state = value;
+    ASSERT(value >= 0.0);
+    state = value + eps;
 }
 
 void MultiplicativeSmoother::process(absl::Span<const float> input, absl::Span<float> output)
@@ -126,7 +127,7 @@ void MultiplicativeSmoother::process(absl::Span<const float> input, absl::Span<f
     for (unsigned i = 0; i < size; ++i) {
         const auto intermediate = gainPower->get(input[i] / state);
         output[i] = intermediate * state;
-        state = output[i] * intermediate;
+        state = output[i] * intermediate + eps;
     }
 }
 
