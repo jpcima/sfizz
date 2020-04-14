@@ -51,7 +51,7 @@ private:
     bool smoothing { false };
     float state { 1.0 };
     const PowerFunctionTable* gainPower;
-    static constexpr float eps = 1e-5;
+    static constexpr float eps = 1e-9;
 };
 
 }
