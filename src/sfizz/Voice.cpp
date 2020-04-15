@@ -109,6 +109,8 @@ void sfz::Voice::startVoice(Region* region, int delay, int number, float value, 
     initialDelay = delay + static_cast<int>(region->getDelay() * sampleRate);
     baseFrequency = midiNoteFrequency(number);
     bendStepFactor = centsFactor(region->bendStep);
+    bendSmoother.setSmoothing(region->bendSmooth, sampleRate);
+    bendSmoother.reset(region->getBendInCents(resources.midiState.getPitchBend()));
     egEnvelope.reset(region->amplitudeEG, *region, resources.midiState, delay, value, sampleRate);
 }
 
@@ -447,8 +449,7 @@ void sfz::Voice::fillWithData(AudioSpan<float> buffer) noexcept
 
     const auto events = resources.midiState.getPitchEvents();
     const auto bendLambda = [this](float bend) {
-        const auto bendInCents = bend > 0.0f ? bend * static_cast<float>(region->bendUp) : -bend * static_cast<float>(region->bendDown);
-        return centsFactor(bendInCents);
+        return region->getBendInCents(bend);
     };
 
     if (region->bendStep > 1)
@@ -551,13 +552,15 @@ void sfz::Voice::fillWithGenerator(AudioSpan<float> buffer) noexcept
 
         const auto events = resources.midiState.getPitchEvents();
         const auto bendLambda = [this](float bend) {
-            const auto bendInCents = bend > 0.0f ? bend * static_cast<float>(region->bendUp) : -bend * static_cast<float>(region->bendDown);
-            return centsFactor(bendInCents);
+            return region->getBendInCents(bend);
         };
+
         if (region->bendStep > 1)
             pitchBendEnvelope(events, *bends, bendLambda, bendStepFactor);
         else
             pitchBendEnvelope(events, *bends, bendLambda);
+        bendSmoother.process(*bends, *bends);
+
         applyGain<float>(*bends, *frequencies);
 
         for (const auto& mod : region->tuneCC) {

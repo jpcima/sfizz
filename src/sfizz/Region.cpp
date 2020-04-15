@@ -855,6 +855,9 @@ bool sfz::Region::parseOpcode(const Opcode& opcode)
     case hash("bend_step"):
         setValueFromOpcode(opcode, bendStep, Default::bendStepRange);
         break;
+    case hash("bend_smooth"):
+        setValueFromOpcode(opcode, bendSmooth, Default::smoothCCRange);
+        break;
 
     // Amplitude Envelope
     case hash("ampeg_attack"):
@@ -1292,4 +1295,10 @@ float sfz::Region::getGainToEffectBus(unsigned number) const noexcept
         return 0.0;
 
     return gainToEffect[number];
+}
+
+float sfz::Region::getBendInCents(float bend) const noexcept
+{
+    const auto bendInCents = bend > 0.0f ? bend * static_cast<float>(bendUp) : -bend * static_cast<float>(bendDown);
+    return centsFactor(bendInCents);
 }

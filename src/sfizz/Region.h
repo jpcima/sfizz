@@ -185,6 +185,14 @@ struct Region {
      */
     float velocityCurve(float velocity) const noexcept;
     /**
+     * @brief Get the cents factor for a given bend value between -1 and 1
+     *
+     * @param bend
+     * @return float
+     */
+    float getBendInCents(float bend) const noexcept;
+
+    /**
      * @brief Get the region offset in samples
      *
      * @return uint32_t
@@ -319,6 +327,7 @@ struct Region {
     int bendUp { Default::bendUp };
     int bendDown { Default::bendDown };
     int bendStep { Default::bendStep };
+    uint8_t bendSmooth { Default::bendSmooth };
 
     // Envelopes
     EGDescription amplitudeEG;

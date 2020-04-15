@@ -302,6 +302,8 @@ private:
     std::normal_distribution<float> noiseDist { 0, config::noiseVariance };
 
     MultiplicativeSmoother gainSmoother;
+    MultiplicativeSmoother bendSmoother;
+
     HistoricalBuffer<float> powerHistory { config::powerHistoryLength };
     LEAK_DETECTOR(Voice);
 };

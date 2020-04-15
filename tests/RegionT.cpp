@@ -855,7 +855,7 @@ TEST_CASE("[Region] Parsing opcodes")
         REQUIRE(region.tune == -9600);
     }
 
-    SECTION("bend_up, bend_down, bend_step")
+    SECTION("bend_up, bend_down, bend_step, bend_smooth")
     {
         REQUIRE(region.bendUp == 200);
         REQUIRE(region.bendDown == -200);
@@ -882,6 +882,12 @@ TEST_CASE("[Region] Parsing opcodes")
         REQUIRE(region.bendStep == 1);
         region.parseOpcode({ "bend_step", "9700" });
         REQUIRE(region.bendStep == 1200);
+        region.parseOpcode({ "bend_smooth", "10" });
+        REQUIRE(region.bendSmooth == 10);
+        region.parseOpcode({ "bend_smooth", "120" });
+        REQUIRE(region.bendSmooth == 100);
+        region.parseOpcode({ "bend_smooth", "-2" });
+        REQUIRE(region.bendSmooth == 0);
     }
 
     SECTION("ampeg")

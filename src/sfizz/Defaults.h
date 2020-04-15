@@ -207,6 +207,7 @@ namespace Default
     constexpr int bendUp { 200 }; // No range here because the bounds can be inverted
     constexpr int bendDown { -200 };
     constexpr int bendStep { 1 };
+    constexpr uint8_t bendSmooth { 0 };
 
     // Envelope generators
 	constexpr float attack { 0 };
