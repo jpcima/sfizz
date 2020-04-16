@@ -86,7 +86,7 @@ void sfz::Voice::startVoice(Region* region, int delay, int number, float value, 
     if (triggerType != TriggerType::CC)
         baseGain *= region->getNoteGain(number, value);
 
-    gainSmoother.reset(db2mag(baseVolumedB) * baseGain);
+    gainSmoother.reset();
     // Check that we can handle the number of filters; filters should be cleared here
     ASSERT((filters.capacity() - filters.size()) >= region->filters.size());
     ASSERT((equalizers.capacity() - equalizers.size()) >= region->equalizers.size());
