@@ -38,7 +38,7 @@ struct Modifier {
     static_assert(config::maxCurves - 1 <= std::numeric_limits<decltype(curve)>::max(), "The curve type in the Modifier struct cannot support the required number of curves");
 };
 
-template<class ValueType>
+template <class ValueType>
 struct CCDataComparator {
     bool operator()(const CCData<ValueType>& ccData, const int& cc)
     {
@@ -193,14 +193,6 @@ namespace literals {
         return normalize7Bits(value);
     }
 }
-
-/**
- * @brief Convert a note in string to its equivalent midi note number
- *
- * @param value
- * @return absl::optional<uint8_t>
- */
-absl::optional<uint8_t> readNoteValue(const absl::string_view& value);
 
 /**
  * @brief From a source view, find the next sfz header and its members and
