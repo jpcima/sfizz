@@ -138,3 +138,23 @@ TEST_CASE("[Opcode] Note values")
     REQUIRE(noteValue);
     REQUIRE(*noteValue == 61);
 }
+
+TEST_CASE("[Opcode] Categories")
+{
+    REQUIRE(sfz::Opcodes::category("sample") == sfz::kOpcodeNormal);
+    REQUIRE(sfz::Opcodes::category("amplitude_oncc11") == sfz::kOpcodeOnCcN);
+    REQUIRE(sfz::Opcodes::category("cutoff_cc22") == sfz::kOpcodeOnCcN);
+    REQUIRE(sfz::Opcodes::category("lfo01_pitch_curvecc33") == sfz::kOpcodeCurveCcN);
+    REQUIRE(sfz::Opcodes::category("pan_stepcc44") == sfz::kOpcodeStepCcN);
+    REQUIRE(sfz::Opcodes::category("noise_level_smoothcc55") == sfz::kOpcodeSmoothCcN);
+}
+
+TEST_CASE("[Opcode] Opcode oncc to *cc")
+{
+    REQUIRE(sfz::Opcodes::toCurveCc("sample").empty());
+    REQUIRE(sfz::Opcodes::toStepCc("sample").empty());
+    REQUIRE(sfz::Opcodes::toSmoothCc("sample").empty());
+    REQUIRE(sfz::Opcodes::toCurveCc("amplitude_oncc11") == "amplitude_curvecc11");
+    REQUIRE(sfz::Opcodes::toStepCc("cutoff_cc22") == "cutoff_stepcc22");
+    REQUIRE(sfz::Opcodes::toSmoothCc("lfo01_pitch_cc33") == "lfo01_pitch_smoothcc33");
+}

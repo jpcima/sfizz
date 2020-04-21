@@ -21,6 +21,22 @@
 
 namespace sfz {
 /**
+ * @brief A category which an opcode may belong to.
+ */
+enum OpcodeCategory {
+    //! An ordinary opcode
+    kOpcodeNormal,
+    //! A region opcode which matches *_onccN or *_ccN
+    kOpcodeOnCcN,
+    //! A region opcode which matches *_curveccN
+    kOpcodeCurveCcN,
+    //! A region opcode which matches *_stepccN
+    kOpcodeStepCcN,
+    //! A region opcode which matches *_smoothccN
+    kOpcodeSmoothCcN,
+};
+
+/**
  * @brief Opcode description class. The class parses the parameters
  * of the opcode on construction.
  *
@@ -35,6 +51,50 @@ struct Opcode {
     std::vector<uint16_t> parameters;
     LEAK_DETECTOR(Opcode);
 };
+
+namespace Opcodes {
+    /**
+     * @brief Determine the category for this opcode.
+     */
+    OpcodeCategory category(absl::string_view opcodeName) noexcept;
+
+    /**
+     * @brief Replace the `_oncc` part of an opcode name.
+     *
+     * @return a substitution, or empty string on failure.
+     */
+    std::string substOnCc(absl::string_view opcodeName, std::string replacement);
+
+    /**
+     * @brief Get the `_curveccN` opcode matching the given `_onccN`.
+     *
+     * @return an opcode name, or empty string on failure.
+     */
+    inline std::string toCurveCc(absl::string_view opcodeName)
+    {
+        return substOnCc(opcodeName, "_curvecc");
+    }
+
+    /**
+     * @brief Get the `_stepccN` opcode matching the given `_onccN`.
+     *
+     * @return an opcode name, or empty string on failure.
+     */
+    inline std::string toStepCc(absl::string_view opcodeName)
+    {
+        return substOnCc(opcodeName, "_stepcc");
+    }
+
+    /**
+     * @brief Get the `_smoothccN` opcode matching the given `_onccN`.
+     *
+     * @return an opcode name, or empty string on failure.
+     */
+    inline std::string toSmoothCc(absl::string_view opcodeName)
+    {
+        return substOnCc(opcodeName, "_smoothcc");
+    }
+}
 
 /**
  * @brief Read a value from the sfz file and cast it to the destination parameter along
