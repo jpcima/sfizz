@@ -483,6 +483,14 @@ private:
      */
     void buildRegion(const std::vector<Opcode>& regionOpcodes);
     /**
+     * @brief Helper function to modify the region opcodes such that
+     * contextual information is embedded into `*_onccN` opcodes.
+     *
+     * @param regionOpcodes the opcodes that are specific to the region
+     * @return preprocessed opcodes
+     */
+    std::vector<Opcode> preprocessRegionOpcodes(const std::vector<Opcode>& regionOpcodes) const;
+    /**
      * @brief Resets and possibly changes the number of voices (polyphony) in
      * the synth.
      *

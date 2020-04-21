@@ -10,10 +10,12 @@
 #include "Range.h"
 #include "SfzHelpers.h"
 #include "StringViewHelpers.h"
-#include <absl/types/optional.h>
+#include "nonstd/value_ptr.hpp"
+#include "absl/types/optional.h"
 #include "absl/meta/type_traits.h"
 #include <string_view>
 #include <vector>
+#include <memory>
 #include <type_traits>
 
 // charconv support is still sketchy with clang/gcc so we use abseil's numbers
@@ -37,6 +39,16 @@ enum OpcodeCategory {
 };
 
 /**
+ * @brief Optional contextual information for opcodes
+ */
+struct OpcodeContext {
+    union {
+        //! Context data for *_onccN/*_ccN opcodes
+        struct { uint8_t curve; float step; uint8_t smooth; } cc;
+    };
+};
+
+/**
  * @brief Opcode description class. The class parses the parameters
  * of the opcode on construction.
  *
@@ -49,6 +61,7 @@ struct Opcode {
     uint64_t lettersOnlyHash { Fnv1aBasis };
     // This is to handle the integer parameters of some opcodes
     std::vector<uint16_t> parameters;
+    nonstd::value_ptr<OpcodeContext> context;
     LEAK_DETECTOR(Opcode);
 };
 

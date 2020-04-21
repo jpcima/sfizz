@@ -97,27 +97,94 @@ void sfz::Synth::buildRegion(const std::vector<Opcode>& regionOpcodes)
 {
     auto lastRegion = absl::make_unique<Region>(resources.midiState, defaultPath);
 
-    auto parseOpcodes = [&](const std::vector<Opcode>& opcodes) {
-        for (auto& opcode : opcodes) {
-            const auto unknown = absl::c_find_if(unknownOpcodes, [&](absl::string_view sv) { return sv.compare(opcode.opcode) == 0; });
-            if (unknown != unknownOpcodes.end()) {
-                continue;
-            }
-
-            if (!lastRegion->parseOpcode(opcode))
-                unknownOpcodes.emplace_back(opcode.opcode);
-        }
+    const std::vector<Opcode>* opcodeSources[] = {
+        &globalOpcodes,
+        &masterOpcodes,
+        &groupOpcodes,
+        &regionOpcodes,
     };
 
-    parseOpcodes(globalOpcodes);
-    parseOpcodes(masterOpcodes);
-    parseOpcodes(groupOpcodes);
-    parseOpcodes(regionOpcodes);
+    // collect relevant opcodes into a list
+    std::vector<Opcode> allOpcodes;
+
+    size_t totalOpcodes = 0;
+    for (const std::vector<Opcode>* source : opcodeSources)
+        totalOpcodes += source->size();
+    allOpcodes.reserve(totalOpcodes);
+
+    for (const std::vector<Opcode>* source : opcodeSources)
+        allOpcodes.insert(allOpcodes.end(), source->begin(), source->end());
+
+    // preprocess the opcodes
+    allOpcodes = preprocessRegionOpcodes(allOpcodes);
+
+    // handle the opcodes
+    for (const Opcode& opcode : allOpcodes) {
+        const auto unknown = absl::c_find_if(unknownOpcodes, [&](absl::string_view sv) { return sv.compare(opcode.opcode) == 0; });
+        if (unknown != unknownOpcodes.end()) {
+            continue;
+        }
+
+        if (!lastRegion->parseOpcode(opcode))
+            unknownOpcodes.emplace_back(opcode.opcode);
+    }
 
     if (octaveOffset != 0 || noteOffset != 0)
         lastRegion->offsetAllKeys(octaveOffset * 12 + noteOffset);
 
     regions.push_back(std::move(lastRegion));
+}
+
+std::vector<sfz::Opcode> sfz::Synth::preprocessRegionOpcodes(const std::vector<Opcode>& regionOpcodes) const
+{
+    auto findOpcodeByName = [&regionOpcodes](absl::string_view name) -> const Opcode* {
+        auto it = std::find_if(
+            regionOpcodes.rbegin(), regionOpcodes.rend(),
+            [name](const Opcode &x) -> bool { return x.opcode == name; });
+        return (it != regionOpcodes.rend()) ? &*it : nullptr;
+    };
+
+    ///
+    std::vector<Opcode> preprocessedOpcodes;
+    preprocessedOpcodes.reserve(regionOpcodes.size());
+
+    for (const Opcode& opcode : regionOpcodes) {
+        const OpcodeCategory category = Opcodes::category(opcode.opcode);
+
+        switch (category) {
+        default:
+            preprocessedOpcodes.push_back(opcode);
+            break;
+        case kOpcodeOnCcN:
+            {
+                OpcodeContext context;
+                context.cc.curve = 0;
+                context.cc.step = 127;
+                context.cc.smooth = 0;
+
+                const Opcode* curveCC = findOpcodeByName(Opcodes::toCurveCc(opcode.opcode));
+                const Opcode* stepCC = findOpcodeByName(Opcodes::toStepCc(opcode.opcode));
+                const Opcode* smoothCC = findOpcodeByName(Opcodes::toSmoothCc(opcode.opcode));
+                if (curveCC)
+                    setValueFromOpcode(*curveCC, context.cc.curve, Default::curveCCRange);
+                if (stepCC)
+                    setValueFromOpcode(*stepCC, context.cc.step, Default::stepCCRange);
+                if (smoothCC)
+                    setValueFromOpcode(*smoothCC, context.cc.smooth, Default::smoothCCRange);
+
+                Opcode contextualizedOpcode = opcode;
+                contextualizedOpcode.context = context;
+                preprocessedOpcodes.push_back(contextualizedOpcode);
+            }
+            break;
+        case kOpcodeCurveCcN:
+        case kOpcodeStepCcN:
+        case kOpcodeSmoothCcN:
+            break;
+        }
+    }
+
+    return preprocessedOpcodes;
 }
 
 void sfz::Synth::clear()
