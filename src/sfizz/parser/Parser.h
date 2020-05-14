@@ -71,6 +71,7 @@ private:
     void processDirective();
     void processHeader();
     void processOpcode();
+    bool extractOpcodeValueRaw(std::string& valueRaw);
     void reset();
 
     // errors and warnings

@@ -162,8 +162,10 @@ void Parser::processDirective()
         reader.skipChars(" \t");
 
         std::string value;
-        extractToEol(reader, &value);
-        trimRight(value);
+        if (!extractOpcodeValueRaw(value)) {
+            recover();
+            return;
+        }
 
         addDefinition(id, value);
     }
@@ -271,17 +273,44 @@ void Parser::processOpcode()
     reader.getChar();
 
     SourceLocation valueStart = reader.location();
+
     std::string valueRaw;
+    if (!extractOpcodeValueRaw(valueRaw)) {
+        recover();
+        return;
+    }
+
+    SourceLocation valueEnd = reader.location();
+
+    if (!_currentHeader)
+        emitWarning({ opcodeStart, valueEnd }, "The opcode is not under any header.");
+
+    std::string valueExpanded = expandDollarVars({ valueStart, valueEnd }, valueRaw);
+    _currentOpcodes.emplace_back(nameExpanded, valueExpanded);
+
+    if (_listener)
+        _listener->onParseOpcode({ opcodeStart, opcodeEnd }, { valueStart, valueEnd }, nameExpanded, valueExpanded);
+}
+
+bool Parser::extractOpcodeValueRaw(std::string& valueRaw)
+{
+    Reader& reader = *_included.back();
+
+    SourceLocation valueStart = reader.location();
     extractToEol(reader, &valueRaw);
 
-    // if a "=" or "<" character was hit, it means we read too far
-    size_t position = valueRaw.find_first_of("=<");
+    auto isRawOpcodeValueChar = [](char c) {
+        return isIdentifierChar(c) || c == '$';
+    };
+
+    // if a "=", "<" or "#" character was hit, it means we read too far
+    size_t position = valueRaw.find_first_of("=<#");
     if (position != valueRaw.npos) {
         char hitChar = valueRaw[position];
 
         // if it was "=", rewind before the opcode name and spaces preceding
         if (hitChar == '=') {
-            while (position > 0 && isRawOpcodeNameChar(valueRaw[position - 1]))
+            while (position > 0 && isRawOpcodeValueChar(valueRaw[position - 1]))
                 --position;
             while (position > 0 && isSpaceChar(valueRaw[position - 1]))
                 --position;
@@ -295,8 +324,9 @@ void Parser::processOpcode()
         if (hitChar == '=' && !reader.hasOneOfChars(" \t\r\n")) {
             SourceLocation end = reader.location();
             emitError({ valueStart, end }, "Unexpected `=` in opcode value.");
-            recover();
-            return;
+            reader.putBackChars(valueRaw);
+            valueRaw.clear();
+            return false;
         }
     }
 
@@ -304,16 +334,8 @@ void Parser::processOpcode()
         reader.putBackChar(valueRaw.back());
         valueRaw.pop_back();
     }
-    SourceLocation valueEnd = reader.location();
 
-    if (!_currentHeader)
-        emitWarning({ opcodeStart, valueEnd }, "The opcode is not under any header.");
-
-    std::string valueExpanded = expandDollarVars({ valueStart, valueEnd }, valueRaw);
-    _currentOpcodes.emplace_back(nameExpanded, valueExpanded);
-
-    if (_listener)
-        _listener->onParseOpcode({ opcodeStart, opcodeEnd }, { valueStart, valueEnd }, nameExpanded, valueExpanded);
+    return true;
 }
 
 void Parser::emitError(const SourceRange& range, const std::string& message)
@@ -457,21 +479,25 @@ std::string Parser::expandDollarVars(const SourceRange& range, absl::string_view
             std::string name;
             name.reserve(64);
 
-            while (i < n && isIdentifierChar(src[i]))
+            // ARIA: we will accumulate any chars after $, until this is the
+            //       name of a known variable
+            auto def = _currentDefinitions.end();
+            while (i < n && isIdentifierChar(src[i]) && def == _currentDefinitions.end()) {
                 name.push_back(src[i++]);
+                def = _currentDefinitions.find(name);
+            }
 
             if (name.empty()) {
                 emitWarning(range, "Expected variable name after $.");
                 continue;
             }
 
-            auto it = _currentDefinitions.find(name);
-            if (it == _currentDefinitions.end()) {
+            if (def == _currentDefinitions.end()) {
                 emitWarning(range, "The variable `" + name + "` is not defined.");
                 continue;
             }
 
-            dst.append(it->second);
+            dst.append(def->second);
         }
     }
 
