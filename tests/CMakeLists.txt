@@ -3,6 +3,8 @@
 
 project(sfizz)
 
+find_package(PkgConfig)
+
 set(SFIZZ_TEST_SOURCES
     RegionT.cpp
     ParsingT.cpp
@@ -37,7 +39,6 @@ target_link_libraries(sfizz_tests PRIVATE sfizz::sfizz)
 sfizz_enable_lto_if_needed(sfizz_tests)
 # target_link_libraries(sfizz_tests PRIVATE absl::strings absl::str_format absl::flat_hash_map cnpy absl::span absl::algorithm)
 
-find_package(PkgConfig)
 if(PKGCONFIG_FOUND)
 pkg_check_modules(JACK "jack")
 endif()
@@ -75,5 +76,15 @@ target_link_libraries(sfizz_plot_curve PRIVATE sfizz::sfizz)
 
 add_executable(sfizz_plot_wavetables PlotWavetables.cpp)
 target_link_libraries(sfizz_plot_wavetables PRIVATE sfizz::sfizz)
+
+if(PKGCONFIG_FOUND)
+    pkg_check_modules(SOXR "soxr")
+endif()
+
+if(SOXR_FOUND)
+    add_executable(sfizz_qc_resampler QCResampler.cpp)
+    target_include_directories(sfizz_qc_resampler PRIVATE ${SOXR_INCLUDE_DIRS})
+    target_link_libraries(sfizz_qc_resampler PRIVATE sfizz::sfizz sfizz-sndfile ${SOXR_LIBRARIES})
+endif()
 
 file(COPY "." DESTINATION ${CMAKE_BINARY_DIR}/tests)
