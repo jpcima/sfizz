@@ -209,6 +209,18 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
         if (auto value = readOpcode(opcode.value, Default::midi7Range))
             ccConditions[opcode.parameters.back()].setEnd(normalizeCC(*value));
         break;
+    case hash("lohdcc&"): // also lorealcc&
+        if (opcode.parameters.back() >= config::numCCs)
+            return false;
+        if (auto value = readOpcode(opcode.value, Default::normalizedRange))
+            ccConditions[opcode.parameters.back()].setStart(*value);
+        break;
+    case hash("hihdcc&"): // also hirealcc&
+        if (opcode.parameters.back() >= config::numCCs)
+            return false;
+        if (auto value = readOpcode(opcode.value, Default::normalizedRange))
+            ccConditions[opcode.parameters.back()].setEnd(*value);
+        break;
     case hash("sw_lokey"):
         setRangeStartFromOpcode(opcode, keyswitchRange, Default::keyRange);
         break;
@@ -311,6 +323,18 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
             return false;
         if (auto value = readOpcode(opcode.value, Default::midi7Range))
             ccTriggers[opcode.parameters.back()].setEnd(normalizeCC(*value));
+        break;
+    case hash("start_lohdcc&"): // also on_lohdcc&
+        if (opcode.parameters.back() >= config::numCCs)
+            return false;
+        if (auto value = readOpcode(opcode.value, Default::normalizedRange))
+            ccTriggers[opcode.parameters.back()].setStart(*value);
+        break;
+    case hash("start_hihdcc&"): // also on_hihdcc&
+        if (opcode.parameters.back() >= config::numCCs)
+            return false;
+        if (auto value = readOpcode(opcode.value, Default::normalizedRange))
+            ccTriggers[opcode.parameters.back()].setEnd(*value);
         break;
 
     // Performance parameters: amplifier
