@@ -19,3 +19,6 @@
 	path = vst/external/VST_SDK/VST3_SDK/vstgui4
 	url = https://github.com/sfztools/vstgui.git
 	shallow = true
+[submodule "editor/external/pugl"]
+	path = editor/external/pugl
+	url = https://github.com/drobilla/pugl.git
