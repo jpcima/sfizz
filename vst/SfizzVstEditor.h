@@ -6,84 +6,30 @@
 
 #pragma once
 #include "SfizzVstController.h"
-#include "public.sdk/source/vst/vstguieditor.h"
-#if !defined(__APPLE__) && !defined(_WIN32)
-namespace VSTGUI { class RunLoop; }
-#endif
+#include "public.sdk/source/vst/vsteditcontroller.h"
+#include <memory>
+class Editor;
 
 using namespace Steinberg;
-using namespace VSTGUI;
 
-class SfizzVstEditor : public Vst::VSTGUIEditor, public IControlListener, public SfizzVstController::StateListener {
+class SfizzVstEditor : public Vst::EditorView,
+                       public SfizzVstController::StateListener {
 public:
-    explicit SfizzVstEditor(void *controller);
+    explicit SfizzVstEditor(Vst::EditController* controller);
     ~SfizzVstEditor();
 
-    bool PLUGIN_API open(void* parent, const VSTGUI::PlatformType& platformType = VSTGUI::kDefaultNative) override;
-    void PLUGIN_API close() override;
-
-    SfizzVstController* getController() const
-    {
-        return static_cast<SfizzVstController*>(Vst::VSTGUIEditor::getController());
-    }
-
-    // IControlListener
-    void valueChanged(CControl* ctl) override;
-    void enterOrLeaveEdit(CControl* ctl, bool enter);
-    void controlBeginEdit(CControl* ctl) override;
-    void controlEndEdit(CControl* ctl) override;
-
-    // VSTGUIEditor
-    CMessageResult notify(CBaseObject* sender, const char* message) override;
-
-    // SfizzVstController::StateListener
     void onStateChanged() override;
 
+    tresult PLUGIN_API isPlatformTypeSupported(FIDString type) override;
+    tresult PLUGIN_API attached(void* parent, FIDString type) override;
+    tresult PLUGIN_API removed() override;
+
 private:
-    void chooseSfzFile();
-    void loadSfzFile(const std::string& filePath);
-
-    void createFrameContents();
-    void updateStateDisplay();
-    void updateFileLabel(const std::string& filePath);
-    void setActivePanel(unsigned panelId);
-
-    template <class Control>
-    void adjustMinMaxToRangeParam(Control* c, Vst::ParamID id)
-    {
-        auto* p = static_cast<Vst::RangeParameter*>(getController()->getParameterObject(id));
-        c->setMin(p->getMin());
-        c->setMax(p->getMax());
-    }
-
-    enum {
-        kPanelGeneral,
-        // kPanelControls,
-        kPanelSettings,
-        kNumPanels,
-    };
-
-    unsigned _activePanel = 0;
-    CViewContainer* _subPanels[kNumPanels] = {};
-
-    enum {
-        kTagLoadSfzFile,
-        kTagSetVolume,
-        kTagSetNumVoices,
-        kTagSetOversampling,
-        kTagSetPreloadSize,
-        kTagFirstChangePanel,
-        kTagLastChangePanel = kTagFirstChangePanel + kNumPanels - 1,
-    };
-
-    CBitmap _logo;
-    CTextLabel* _fileLabel = nullptr;
-    CSliderBase *_volumeSlider = nullptr;
-    CSliderBase *_numVoicesSlider = nullptr;
-    CSliderBase *_oversamplingSlider = nullptr;
-    CSliderBase *_preloadSizeSlider = nullptr;
+    std::unique_ptr<Editor> editor_;
 
 #if !defined(__APPLE__) && !defined(_WIN32)
-    SharedPointer<RunLoop> _runLoop;
+    class IdleTimerHandler;
+    friend class IdleTimerHandler;
+    std::unique_ptr<IdleTimerHandler> idleTimerHandler_;
 #endif
 };
