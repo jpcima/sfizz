@@ -29,4 +29,5 @@ clang-tidy \
   vst/SfizzVstState.cpp \
   -- -Iexternal/abseil-cpp -Isrc/external -Isrc/external/pugixml/src \
       -Isrc/sfizz -Isrc -Isrc/external/spline \
-      -Ivst -Ivst/external/VST_SDK/VST3_SDK -Ivst/external/VST_SDK/VST3_SDK/vstgui4 -Ivst/external/ring_buffer -DNDEBUG
+      -Ieditor/src -Ieditor/external/pugl -Iexternal/elements/lib/include -Iexternal/elements/lib/infra/include -DELEMENTS_HOST_UI_LIBRARY_CUSTOM=1 \
+      -Ivst -Ivst/external/VST_SDK/VST3_SDK -Ivst/external/ring_buffer -DNDEBUG
