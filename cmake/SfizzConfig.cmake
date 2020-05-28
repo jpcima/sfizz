@@ -43,10 +43,11 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
+# The sndfile library
 add_library(sfizz-sndfile INTERFACE)
 
 if (SFIZZ_USE_VCPKG OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    find_package(LibSndFile REQUIRED)
+    find_package(LibSndFile CONFIG REQUIRED)
     find_path(SNDFILE_INCLUDE_DIR sndfile.hh)
     target_include_directories(sfizz-sndfile INTERFACE "${SNDFILE_INCLUDE_DIR}")
     target_link_libraries(sfizz-sndfile INTERFACE sndfile-static)
@@ -54,12 +55,68 @@ else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(SNDFILE "sndfile" REQUIRED)
     target_include_directories(sfizz-sndfile INTERFACE ${SNDFILE_INCLUDE_DIRS})
-    if (SFIZZ_STATIC_LIBSNDFILE)
+    if (SFIZZ_STATIC_DEPENDENCIES)
         target_link_libraries(sfizz-sndfile INTERFACE ${SNDFILE_STATIC_LIBRARIES})
     else()
         target_link_libraries(sfizz-sndfile INTERFACE ${SNDFILE_LIBRARIES})
     endif()
+    link_directories(${SNDFILE_LIBRARY_DIRS})
 endif()
+
+# The cairo library
+if (SFIZZ_USE_VCPKG OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    find_package(unofficial-cairo CONFIG)
+    if (unofficial-cairo_FOUND)
+        add_library(sfizz-cairo INTERFACE)
+        find_path(CAIRO_INCLUDE_DIR cairo.h PATH_SUFFIXES cairo)
+        target_include_directories(sfizz-cairo INTERFACE "${CAIRO_INCLUDE_DIR}")
+        target_link_libraries(sfizz-cairo INTERFACE unofficial::cairo::cairo)
+    endif()
+else()
+    find_package(PkgConfig REQUIRED)
+    if(WIN32)
+        pkg_check_modules(CAIRO "cairo-win32")
+    elseif(APPLE)
+        pkg_check_modules(CAIRO "cairo-quartz")
+    else()
+        pkg_check_modules(CAIRO "cairo-xlib")
+    endif()
+    if(CAIRO_FOUND)
+        add_library(sfizz-cairo INTERFACE)
+        target_include_directories(sfizz-cairo INTERFACE ${CAIRO_INCLUDE_DIRS})
+        if(SFIZZ_STATIC_DEPENDENCIES)
+            target_link_libraries(sfizz-cairo INTERFACE ${CAIRO_STATIC_LIBRARIES})
+        else()
+            target_link_libraries(sfizz-cairo INTERFACE ${CAIRO_LIBRARIES})
+        endif()
+        link_directories(${CAIRO_LIBRARY_DIRS})
+    endif()
+endif()
+
+# The fontconfig library
+if (SFIZZ_USE_VCPKG OR CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    find_package(unofficial-fontconfig CONFIG)
+    if (unofficial-fontconfig_FOUND)
+        add_library(sfizz-fontconfig INTERFACE)
+        find_path(FONTCONFIG_INCLUDE_DIR fontconfig/fontconfig.h)
+        target_include_directories(sfizz-fontconfig INTERFACE "${FONTCONFIG_INCLUDE_DIR}")
+        target_link_libraries(sfizz-fontconfig INTERFACE unofficial::fontconfig::fontconfig)
+    endif()
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(FONTCONFIG "fontconfig")
+    if(FONTCONFIG_FOUND)
+        add_library(sfizz-fontconfig INTERFACE)
+        target_include_directories(sfizz-fontconfig INTERFACE ${FONTCONFIG_INCLUDE_DIRS})
+        if(SFIZZ_STATIC_DEPENDENCIES)
+            target_link_libraries(sfizz-fontconfig INTERFACE ${FONTCONFIG_STATIC_LIBRARIES})
+        else()
+            target_link_libraries(sfizz-fontconfig INTERFACE ${FONTCONFIG_LIBRARIES})
+        endif()
+        link_directories(${FONTCONFIG_LIBRARY_DIRS})
+    endif()
+endif()
+
 
 
 # If we build with Clang, optionally use libc++. Enabled by default on Apple OS.
@@ -104,12 +161,13 @@ Build using LTO:               ${ENABLE_LTO}
 Build as shared library:       ${SFIZZ_SHARED}
 Build JACK stand-alone client: ${SFIZZ_JACK}
 Build LV2 plug-in:             ${SFIZZ_LV2}
+Build LV2 user interface:      ${SFIZZ_LV2_UI}
 Build VST plug-in:             ${SFIZZ_VST}
 Build AU plug-in:              ${SFIZZ_AU}
 Build benchmarks:              ${SFIZZ_BENCHMARKS}
 Build tests:                   ${SFIZZ_TESTS}
 Use vcpkg:                     ${SFIZZ_USE_VCPKG}
-Statically link libsndfile:    ${SFIZZ_STATIC_LIBSNDFILE}
+Statically link dependencies:  ${SFIZZ_STATIC_DEPENDENCIES}
 Link libatomic:                ${SFIZZ_LINK_LIBATOMIC}
 Use clang libc++:              ${USE_LIBCPP}
 Release asserts:               ${SFIZZ_RELEASE_ASSERTS}

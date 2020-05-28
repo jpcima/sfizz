@@ -17,9 +17,14 @@ set(VSTPLUGIN_SOURCES
     SfizzVstController.cpp
     SfizzVstEditor.cpp
     SfizzVstState.cpp
-    GUIComponents.cpp
-    VstPluginFactory.cpp
-    X11RunLoop.cpp)
+    VstPluginFactory.cpp)
+
+if(WIN32)
+    list(APPEND VSTPLUGIN_SOURCES NativeIdleRunner_win.cpp)
+elseif(APPLE)
+    list(APPEND VSTPLUGIN_SOURCES NativeIdleRunner_mac.mm)
+endif()
+# TODO windows
 
 set(VSTPLUGIN_RESOURCES
     logo.png)
@@ -31,7 +36,7 @@ if(WIN32)
     target_sources(${VSTPLUGIN_PRJ_NAME} PRIVATE vst3.def)
 endif()
 target_link_libraries(${VSTPLUGIN_PRJ_NAME}
-    PRIVATE ${PROJECT_NAME}::${PROJECT_NAME})
+    PRIVATE ${PROJECT_NAME}::${PROJECT_NAME} sfizz_editor)
 target_include_directories(${VSTPLUGIN_PRJ_NAME}
     PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 set_target_properties(${VSTPLUGIN_PRJ_NAME} PROPERTIES
@@ -39,7 +44,7 @@ set_target_properties(${VSTPLUGIN_PRJ_NAME} PROPERTIES
     PREFIX "")
 
 plugin_add_vst3sdk(${VSTPLUGIN_PRJ_NAME})
-plugin_add_vstgui(${VSTPLUGIN_PRJ_NAME})
+#plugin_add_vstgui(${VSTPLUGIN_PRJ_NAME})
 
 # Add the ring buffer
 target_include_directories(${VSTPLUGIN_PRJ_NAME} PRIVATE "external/ring_buffer")
@@ -134,6 +139,13 @@ elseif(SFIZZ_AU)
         "${VST3SDK_BASEDIR}/public.sdk/source/vst/auwrapper/NSDataIBStream.mm")
     target_include_directories(${AUPLUGIN_PRJ_NAME} PRIVATE
         "${VST3SDK_BASEDIR}")
+
+    find_library(APPLE_FOUNDATION_LIBRARY "Foundation")
+    find_library(APPLE_COCOA_LIBRARY "Cocoa")
+    find_library(APPLE_CARBON_LIBRARY "Carbon")
+    find_library(APPLE_AUDIOTOOLBOX_LIBRARY "AudioToolbox")
+    find_library(APPLE_COREAUDIO_LIBRARY "CoreAudio")
+    find_library(APPLE_COREMIDI_LIBRARY "CoreMIDI")
     target_link_libraries(${AUPLUGIN_PRJ_NAME} PRIVATE
         "${APPLE_FOUNDATION_LIBRARY}"
         "${APPLE_COCOA_LIBRARY}"
