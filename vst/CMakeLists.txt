@@ -19,7 +19,9 @@ set(VSTPLUGIN_SOURCES
     SfizzVstState.cpp
     VstPluginFactory.cpp)
 
-if(APPLE)
+if(WIN32)
+    list(APPEND VSTPLUGIN_SOURCES NativeIdleRunner_win.cpp)
+elseif(APPLE)
     list(APPEND VSTPLUGIN_SOURCES NativeIdleRunner_mac.mm)
 endif()
 # TODO windows
