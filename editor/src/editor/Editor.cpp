@@ -6,7 +6,7 @@
 
 #include "Editor.h"
 #include "Res.h"
-#include "Demo.h"
+#include "UI.h"
 #include <elements.hpp>
 #include <elements/support/resource_paths.hpp>
 #include <algorithm>
@@ -15,9 +15,9 @@ namespace el = cycfi::elements;
 namespace cycfi {
 namespace elements {
 
-void show_window(base_view& w);
-void hide_window(base_view& w);
-void process_events(base_view& w);
+    void show_window(base_view& w);
+    void hide_window(base_view& w);
+    void process_events(base_view& w);
 
 } // namespace elements
 } // namespace cycfi
@@ -27,9 +27,7 @@ constexpr int Editor::fixedHeight;
 
 struct Editor::Impl {
     std::unique_ptr<el::view> view_;
-
-    //--- TODO UI: from sliders and knobs example
-    std::unique_ptr<DemoKnobsAndSliders> demo_;
+    std::unique_ptr<UI> ui_;
 };
 
 ///
@@ -53,7 +51,7 @@ bool Editor::open(void* parentWindowId)
         return false;
     }
 
-    view->size({fixedWidth, fixedHeight});
+    view->size({ fixedWidth, fixedHeight });
 
     // make the resource path known to Elements
     cycfi::fs::path resourcePath = Res::getRootPath();
@@ -64,8 +62,8 @@ bool Editor::open(void* parentWindowId)
     }
 
     ///
-    DemoKnobsAndSliders* demo = new DemoKnobsAndSliders(*view);
-    impl_->demo_.reset(demo);
+    UI* ui = new UI(*view);
+    impl_->ui_.reset(ui);
 
     ///
     return true;

@@ -9,8 +9,8 @@
 
 class Editor {
 public:
-    static constexpr int fixedWidth = 1000;
-    static constexpr int fixedHeight = 600;
+    static constexpr int fixedWidth = 640;
+    static constexpr int fixedHeight = 480;
 
     Editor();
     ~Editor();
