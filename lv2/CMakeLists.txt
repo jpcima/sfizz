@@ -71,6 +71,16 @@ if (SFIZZ_USE_VCPKG OR SFIZZ_STATIC_DEPENDENCIES OR CMAKE_CXX_COMPILER_ID MATCHE
     file(COPY "lgpl-3.0.txt" DESTINATION ${PROJECT_BINARY_DIR})
 endif()
 
+# Copy editor resources
+if (SFIZZ_LV2_UI)
+    execute_process (
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${PROJECT_BINARY_DIR}/Resources")
+    foreach(res ${EDITOR_RESOURCES})
+        file (COPY "${CMAKE_CURRENT_SOURCE_DIR}/../editor/resources/${res}"
+            DESTINATION "${PROJECT_BINARY_DIR}/Resources")
+    endforeach()
+endif()
+
 # Installation
 if (NOT MSVC)
     install (DIRECTORY ${PROJECT_BINARY_DIR} DESTINATION ${LV2PLUGIN_INSTALL_DIR}
