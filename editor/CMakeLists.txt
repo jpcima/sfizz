@@ -1,3 +1,9 @@
+# resource files
+set(EDITOR_RESOURCES
+    logo.png
+    PARENT_SCOPE)
+
+# dependency checks
 if(NOT TARGET sfizz-cairo)
     message(FATAL_ERROR "Could not find cairo, required by editor")
 endif()
@@ -36,6 +42,10 @@ else()
     target_include_directories(sfizz-pugl PRIVATE "${X11_INCLUDE_DIR}")
     target_link_libraries(sfizz-pugl PRIVATE ${X11_LIBRARIES})
 endif()
+
+# whereami library
+add_library(sfizz-whereami STATIC EXCLUDE_FROM_ALL external/whereami/src/whereami.c)
+target_include_directories(sfizz-whereami PUBLIC external/whereami/src)
 
 # elements library
 add_library(sfizz-elements STATIC EXCLUDE_FROM_ALL
@@ -85,6 +95,7 @@ target_compile_definitions(sfizz-elements PUBLIC
 # editor
 add_library(sfizz_editor STATIC EXCLUDE_FROM_ALL
     src/editor/Editor.cpp
+    src/editor/Res.cpp
     src/editor/Demo.cpp
     src/host/ElementsPuglWindow.cpp
     src/host/ElementsPuglBaseView.cpp
@@ -101,7 +112,7 @@ else()
         src/host/NativeWindowHelpers_x11.cpp)
 endif()
 target_include_directories(sfizz_editor PUBLIC src)
-target_link_libraries(sfizz_editor PUBLIC sfizz-pugl sfizz-elements)
+target_link_libraries(sfizz_editor PUBLIC sfizz-pugl sfizz-elements sfizz-whereami)
 # need the cyclic dependency editor <-> elements
 target_link_libraries(sfizz-elements PUBLIC sfizz_editor)
 
