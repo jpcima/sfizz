@@ -26,7 +26,7 @@ namespace sfz
  * @tparam MaxChannels the maximum number of channels in the buffer
  * @tparam Alignment the alignment for the buffers
  */
-template <class Type, size_t MaxChannels = sfz::config::numChannels, unsigned int Alignment = SIMDConfig::defaultAlignment>
+template <class Type, size_t MaxChannels = sfz::config::numChannels, unsigned int Alignment = config::defaultAlignment>
 class AudioBuffer {
 public:
     using value_type = typename std::remove_cv<Type>::type;

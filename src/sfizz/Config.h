@@ -58,6 +58,7 @@ namespace config {
     constexpr uint16_t numCCs { 512 };
     constexpr int maxCurves { 256 };
     constexpr int chunkSize { 1024 };
+    constexpr unsigned int defaultAlignment { 16 };
     constexpr int filtersInPool { maxVoices * 2 };
     /**
      * @brief The threshold for age stealing.
@@ -97,7 +98,6 @@ namespace config {
 
 // Enable or disable SIMD accelerators by default
 namespace SIMDConfig {
-    constexpr unsigned int defaultAlignment { 16 };
     constexpr bool writeInterleaved { true };
     constexpr bool readInterleaved { true };
     constexpr bool fill { true };
