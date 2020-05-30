@@ -345,7 +345,7 @@ void sfz::Voice::panStageMono(AudioSpan<float> buffer) noexcept
     copy<float>(leftBuffer, rightBuffer);
 
     // Apply panning
-    fill<float>(*modulationSpan, region->pan);
+    fill(*modulationSpan, region->pan);
     for (const auto& mod : region->panCC) {
         linearModifier(resources, *tempSpan, mod, normalizePercents<float>);
         add<float>(*tempSpan, *modulationSpan);
@@ -366,7 +366,7 @@ void sfz::Voice::panStageStereo(AudioSpan<float> buffer) noexcept
         return;
 
     // Apply panning
-    fill<float>(*modulationSpan, region->pan);
+    fill(*modulationSpan, region->pan);
     for (const auto& mod : region->panCC) {
         linearModifier(resources, *tempSpan, mod, normalizePercents<float>);
         add<float>(*tempSpan, *modulationSpan);
@@ -374,14 +374,14 @@ void sfz::Voice::panStageStereo(AudioSpan<float> buffer) noexcept
     pan<float>(*modulationSpan, leftBuffer, rightBuffer);
 
     // Apply the width/position process
-    fill<float>(*modulationSpan, region->width);
+    fill(*modulationSpan, region->width);
     for (const auto& mod : region->widthCC) {
         linearModifier(resources, *tempSpan, mod, normalizePercents<float>);
         add<float>(*tempSpan, *modulationSpan);
     }
     width<float>(*modulationSpan, leftBuffer, rightBuffer);
 
-    fill<float>(*modulationSpan, region->position);
+    fill(*modulationSpan, region->position);
     for (const auto& mod : region->positionCC) {
         linearModifier(resources, *tempSpan, mod, normalizePercents<float>);
         add<float>(*tempSpan, *modulationSpan);
@@ -445,7 +445,7 @@ void sfz::Voice::fillWithData(AudioSpan<float> buffer) noexcept
     if (!jumps || !bends || !indices || !rightCoeffs || !leftCoeffs)
         return;
 
-    fill<float>(*jumps, pitchRatio * speedRatio);
+    fill(*jumps, pitchRatio * speedRatio);
 
     const auto events = resources.midiState.getPitchEvents();
     const auto bendLambda = [this](float bend) {
@@ -496,8 +496,8 @@ void sfz::Voice::fillWithData(AudioSpan<float> buffer) noexcept
 #endif
                 egEnvelope.startRelease(i, true);
                 fill<int>(indices->subspan(i), sampleEnd);
-                fill<float>(leftCoeffs->subspan(i), 0.0f);
-                fill<float>(rightCoeffs->subspan(i), 1.0f);
+                fill(leftCoeffs->subspan(i), 0.0f);
+                fill(rightCoeffs->subspan(i), 1.0f);
                 break;
             }
         }
@@ -551,7 +551,7 @@ void sfz::Voice::fillWithGenerator(AudioSpan<float> buffer) noexcept
             return;
 
         float keycenterFrequency = midiNoteFrequency(region->pitchKeycenter);
-        fill<float>(*frequencies, pitchRatio * keycenterFrequency);
+        fill(*frequencies, pitchRatio * keycenterFrequency);
 
         const auto events = resources.midiState.getPitchEvents();
         const auto bendLambda = [this](float bend) {

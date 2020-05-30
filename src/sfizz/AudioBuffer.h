@@ -266,7 +266,7 @@ public:
     void clear()
     {
         for (size_t i = 0; i < numChannels; ++i)
-            fill<Type>(getSpan(i), Type{ 0.0 });
+            fill(getSpan(i), Type{ 0.0 });
     }
 
     /**
