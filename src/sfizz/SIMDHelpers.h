@@ -616,6 +616,8 @@ void cumsum(absl::Span<const T> input, absl::Span<T> output) noexcept
 template <>
 void cumsum<float, true>(absl::Span<const float> input, absl::Span<float> output) noexcept;
 
+// FIXME: This should go away once the changes from the resampler are in
+
 namespace _internals {
     template <class T>
     void snippetSFZInterpolationCast(const T*& floatJump, int*& jump, T*& leftCoeff, T*& rightCoeff)
@@ -632,13 +634,12 @@ namespace _internals {
  * and extracts the integer index of the elements to interpolate
  *
  * @tparam T the underlying type
- * @tparam SIMD use the SIMD version or the scalar version
  * @param floatJumps the floating point indices
  * @param jumps the integer indices outputs
  * @param leftCoeffs the left interpolation coefficients
  * @param rightCoeffs the right interpolation coefficients
  */
-template <class T, bool SIMD = SIMDConfig::sfzInterpolationCast>
+template <class T>
 void sfzInterpolationCast(absl::Span<const T> floatJumps, absl::Span<int> jumps, absl::Span<T> leftCoeffs, absl::Span<T> rightCoeffs) noexcept
 {
     CHECK(jumps.size() >= floatJumps.size());
@@ -654,9 +655,6 @@ void sfzInterpolationCast(absl::Span<const T> floatJumps, absl::Span<int> jumps,
     while (floatJump < sentinel)
         _internals::snippetSFZInterpolationCast(floatJump, jump, leftCoeff, rightCoeff);
 }
-
-template <>
-void sfzInterpolationCast<float, true>(absl::Span<const float> floatJumps, absl::Span<int> jumps, absl::Span<float> leftCoeffs, absl::Span<float> rightCoeffs) noexcept;
 
 namespace _internals {
     template <class T>
