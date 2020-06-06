@@ -2,6 +2,7 @@
 set(EDITOR_RESOURCES
     knob.png
     logo.png
+    slider-v.png
     elements_basic.ttf
     PARENT_SCOPE)
 
@@ -99,12 +100,17 @@ target_compile_definitions(sfizz-elements PUBLIC
 
 # editor
 add_library(sfizz_editor STATIC EXCLUDE_FROM_ALL
+    external/elements-extra/combobox.hpp
     src/editor/Editor.h
     src/editor/Editor.cpp
     src/editor/Res.h
     src/editor/Res.cpp
     src/editor/Knob.h
     src/editor/Knob.cpp
+    src/editor/Slider.h
+    src/editor/Slider.cpp
+    src/editor/PageHome.h
+    src/editor/PageHome.cpp
     src/editor/UI.h
     src/editor/UI.cpp
     src/host/ElementsPuglWindow.cpp
@@ -124,7 +130,7 @@ else()
         src/editor/native/FileDialog_zenity.cpp
         src/host/NativeWindowHelpers_x11.cpp)
 endif()
-target_include_directories(sfizz_editor PUBLIC src)
+target_include_directories(sfizz_editor PUBLIC src external/elements-extra)
 target_link_libraries(sfizz_editor PUBLIC sfizz-pugl sfizz-elements sfizz-whereami absl::strings)
 # need the cyclic dependency editor <-> elements
 target_link_libraries(sfizz-elements PUBLIC sfizz_editor)
