@@ -57,7 +57,7 @@ bool Editor::open(void* parentWindowId)
         return false;
     }
 
-    view->size({ fixedWidth, fixedHeight });
+    view->size(el::extent(fixedWidth, fixedHeight));
 
     ///
     UI* ui = new UI(*view);

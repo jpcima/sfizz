@@ -12,12 +12,18 @@ install:
 - cmd: set PATH=C:\Program Files (x86)\Inno Setup 6;%PATH%
 - cmd: if %platform%==Win32 set VCPKG_TRIPLET=x86-windows-static
 - cmd: if %platform%==x64   set VCPKG_TRIPLET=x64-windows-static
+- cmd: cd c:\tools\vcpkg\
+- cmd: git remote add vcpkg-cairo-pr https://github.com/NancyLi1013/vcpkg.git
+- cmd: git fetch vcpkg-cairo-pr dev/NancyLi/11640-fix-cairo
+- cmd: git checkout vcpkg-cairo-pr/dev/NancyLi/11640-fix-cairo
+- cmd: .\bootstrap-vcpkg.bat
+- cmd: cd %APPVEYOR_BUILD_FOLDER%
 - cmd: vcpkg install libsndfile:%VCPKG_TRIPLET%
 - cmd: vcpkg install cairo:%VCPKG_TRIPLET%
 - cmd: vcpkg install fontconfig:%VCPKG_TRIPLET%
 
 before_build:
-- cmd: git submodule update --init
+- cmd: git submodule update --init --recursive
 - cmd: mkdir CMakeBuild
 - cmd: cd CMakeBuild
 - cmd: cmake .. -G"Visual Studio 15 2017" -A"%platform%" -DSFIZZ_JACK=OFF -DSFIZZ_BENCHMARKS=OFF -DSFIZZ_TESTS=OFF -DSFIZZ_LV2=ON -DSFIZZ_VST=ON -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=%VCPKG_TRIPLET% -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake
