@@ -5,6 +5,7 @@
 // If not, contact the sfizz maintainers at https://github.com/sfztools/sfizz
 
 #include "Editor.h"
+#include "EditorController.h"
 #include "Res.h"
 #include "UI.h"
 #include <elements.hpp>
@@ -16,6 +17,7 @@ namespace el = cycfi::elements;
 namespace cycfi {
 namespace elements {
 
+    void* get_native_window_id(base_view& w);
     void show_window(base_view& w);
     void hide_window(base_view& w);
     void process_events(base_view& w);
@@ -26,22 +28,31 @@ namespace elements {
 constexpr int Editor::fixedWidth;
 constexpr int Editor::fixedHeight;
 
-struct Editor::Impl {
+struct Editor::Impl : EditorController::Receiver {
     std::unique_ptr<el::view> view_;
+    EditorController* ctrl_ = nullptr;
+
     std::unique_ptr<UI> ui_;
 
     static void initializeResourcePaths();
+
+    // EditorController::Receiver
+    void uiReceiveNumber(EditId id, float v) override;
+    void uiReceiveString(EditId id, absl::string_view v) override;
 };
 
 ///
 
-Editor::Editor()
+Editor::Editor(EditorController& ctrl)
     : impl_(new Impl)
 {
+    impl_->ctrl_ = &ctrl;
+    ctrl.decorate(impl_.get());
 }
 
 Editor::~Editor()
 {
+    impl_->ctrl_->decorate(nullptr);
 }
 
 bool Editor::open(void* parentWindowId)
@@ -75,6 +86,14 @@ void Editor::close()
 bool Editor::isOpen() const
 {
     return impl_->view_ != nullptr;
+}
+
+void* Editor::getNativeWindowId()
+{
+    if (!impl_->view_)
+        return nullptr;
+
+    return el::get_native_window_id(*impl_->view_);
 }
 
 void Editor::show()
@@ -113,4 +132,25 @@ void Editor::Impl::initializeResourcePaths()
 
     addIfNotExisting(resPaths, resourcePath);
     addIfNotExisting(fontPaths, resourcePath);
+}
+
+///
+void Editor::Impl::uiReceiveNumber(EditId id, float v)
+{
+    // TODO
+    switch (id) {
+
+    default:
+        break;
+    }
+}
+
+void Editor::Impl::uiReceiveString(EditId id, absl::string_view v)
+{
+    // TODO
+    switch (id) {
+
+    default:
+        break;
+    }
 }

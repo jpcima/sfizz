@@ -6,18 +6,20 @@
 
 #pragma once
 #include <memory>
+class EditorController;
 
 class Editor {
 public:
     static constexpr int fixedWidth = 570;
     static constexpr int fixedHeight = 282;
 
-    Editor();
+    explicit Editor(EditorController& ctrl);
     ~Editor();
 
     bool open(void* parentWindowId);
     void close();
     bool isOpen() const;
+    void* getNativeWindowId();
 
     void show();
     void hide();

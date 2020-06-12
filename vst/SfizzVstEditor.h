@@ -6,6 +6,7 @@
 
 #pragma once
 #include "SfizzVstController.h"
+#include "editor/EditorController.h"
 #include "public.sdk/source/vst/vsteditcontroller.h"
 #include <memory>
 class Editor;
@@ -14,9 +15,10 @@ class NativeIdleRunner;
 using namespace Steinberg;
 
 class SfizzVstEditor : public Vst::EditorView,
-                       public SfizzVstController::StateListener {
+                       public SfizzVstController::StateListener,
+                       public EditorController {
 public:
-    explicit SfizzVstEditor(Vst::EditController* controller);
+    explicit SfizzVstEditor(SfizzVstController* controller);
     ~SfizzVstEditor();
 
     void onStateChanged() override;
@@ -24,6 +26,20 @@ public:
     tresult PLUGIN_API isPlatformTypeSupported(FIDString type) override;
     tresult PLUGIN_API attached(void* parent, FIDString type) override;
     tresult PLUGIN_API removed() override;
+
+private:
+    void updateStateDisplay();
+
+protected:
+    // EditorController
+    void uiSendNumber(EditId id, float v) override;
+    void uiSendString(EditId id, absl::string_view v) override;
+    void uiBeginSend(EditId id) override;
+    void uiEndSend(EditId id) override;
+    void uiSendMIDI(const uint8_t* msg, uint32_t len) override;
+
+private:
+    void uiTouch(EditId id, bool t);
 
 private:
     std::unique_ptr<Editor> editor_;
