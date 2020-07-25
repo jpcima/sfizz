@@ -24,7 +24,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FilePool.h"
-#include "FileInstrument.h"
+#include "FileMetadata.h"
 #include "Buffer.h"
 #include "AudioBuffer.h"
 #include "AudioSpan.h"
@@ -234,11 +234,12 @@ absl::optional<sfz::FileInformation> sfz::FilePool::getFileInformation(const Fil
 
     SF_INSTRUMENT instrumentInfo {};
 
-    const int sndFormat = sndFile.format();
-    if ((sndFormat & SF_FORMAT_TYPEMASK) == SF_FORMAT_FLAC)
-        sfz::FileInstruments::extractFromFlac(file, instrumentInfo);
-    else
-        sndFile.command(SFC_GET_INSTRUMENT, &instrumentInfo, sizeof(instrumentInfo));
+    if (!sndFile.command(SFC_GET_INSTRUMENT, &instrumentInfo, sizeof(instrumentInfo))) {
+        // if no instrument, then try extracting from embedded RIFF chunks (flac)
+        FileMetadataReader reader;
+        if (reader.open(file))
+            reader.extractRiffInstrument(instrumentInfo);
+    }
 
     if (!fileId.isReverse()) {
         if (instrumentInfo.loop_count > 0) {
