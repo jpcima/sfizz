@@ -195,6 +195,14 @@ tresult PLUGIN_API SfizzVstProcessor::process(Vst::ProcessData& data)
             _semaToWorker.post();
     }
 
+    if (Vst::IParameterChanges* pc = data.outputParameterChanges) {
+        int32 index;
+        if (Vst::IParamValueQueue* vq = pc->addParameterData(kPidActiveVoices, index)) {
+            const unsigned activeVoices = synth.getNumActiveVoices();
+            vq->addPoint(0, kParamActiveVoicesRange.normalize(activeVoices), index);
+        }
+    }
+
     return kResultTrue;
 }
 

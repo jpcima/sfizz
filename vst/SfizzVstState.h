@@ -25,6 +25,7 @@ enum {
     kPidScalaRootKey,
     kPidTuningFrequency,
     kPidStretchedTuning,
+    kPidActiveVoices,
     kPidMidiAftertouch,
     kPidMidiPitchBend,
     kPidMidiCC0,
@@ -93,3 +94,4 @@ static constexpr SfizzParameterRange kParamPreloadSizeRange(8192.0, 1024.0, 6553
 static constexpr SfizzParameterRange kParamScalaRootKey(60.0, 0.0, 127.0);
 static constexpr SfizzParameterRange kParamTuningFrequency(440.0, 300.0, 500.0);
 static constexpr SfizzParameterRange kParamStretchedTuning(0.0, 0.0, 1.0);
+static constexpr SfizzParameterRange kParamActiveVoicesRange(0.0, 0.0, 256.0);

@@ -47,6 +47,12 @@ tresult PLUGIN_API SfizzVstControllerNoUi::initialize(FUnknown* context)
             Steinberg::String("Stretched tuning"), pid++, nullptr,
             0, Vst::ParameterInfo::kCanAutomate, Vst::kRootUnitId));
 
+    // Output parameters
+    parameters.addParameter(
+        kParamActiveVoicesRange.createParameter(
+            Steinberg::String("Active voices"), pid++, nullptr,
+            0, Vst::ParameterInfo::kIsReadOnly, Vst::kRootUnitId));
+
     // MIDI special controllers
     parameters.addParameter(Steinberg::String("Aftertouch"), nullptr, 0, 0.5, 0, pid++, Vst::kRootUnitId);
     parameters.addParameter(Steinberg::String("Pitch bend"), nullptr, 0, 0.5, 0, pid++, Vst::kRootUnitId);
