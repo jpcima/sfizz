@@ -20,6 +20,12 @@ set (SFIZZ_HEADERS
     sfizz/Config.h
     sfizz/Curve.h
     sfizz/Debug.h
+    sfizz/modulations/ModId.h
+    sfizz/modulations/ModKey.h
+    sfizz/modulations/ModKeyHash.h
+    sfizz/modulations/ModMatrix.h
+    sfizz/modulations/ModGenerator.h
+    sfizz/modulations/sources/Controller.h
     sfizz/effects/impl/ResonantArray.h
     sfizz/effects/impl/ResonantArrayAVX.h
     sfizz/effects/impl/ResonantArraySSE.h
@@ -114,6 +120,11 @@ set (SFIZZ_SOURCES
     sfizz/RTSemaphore.cpp
     sfizz/Panning.cpp
     sfizz/Effects.cpp
+    sfizz/modulations/ModId.cpp
+    sfizz/modulations/ModKey.cpp
+    sfizz/modulations/ModKeyHash.cpp
+    sfizz/modulations/ModMatrix.cpp
+    sfizz/modulations/sources/Controller.cpp
     sfizz/effects/Nothing.cpp
     sfizz/effects/Filter.cpp
     sfizz/effects/Eq.cpp
