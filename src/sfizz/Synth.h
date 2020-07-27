@@ -17,12 +17,12 @@
 #include "AudioSpan.h"
 #include "parser/Parser.h"
 #include "VoiceStealing.h"
-#include "absl/types/span.h"
+#include <absl/types/span.h>
 #include <absl/types/optional.h>
+#include <absl/strings/string_view.h>
 #include <random>
 #include <mutex>
 #include <set>
-#include <string_view>
 #include <vector>
 
 namespace sfz {
@@ -761,7 +761,6 @@ private:
     struct SettingsPerVoice {
         size_t maxFilters { 0 };
         size_t maxEQs { 0 };
-        ModifierArray<size_t> maxModifiers { 0 };
     };
     SettingsPerVoice settingsPerVoice;
 
