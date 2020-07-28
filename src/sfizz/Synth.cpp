@@ -1349,7 +1349,7 @@ void sfz::Synth::setupModMatrix()
         for (const Region::Connection& conn : region->connections) {
             ModGenerator* gen = nullptr;
 
-            switch (conn.first.id()) {
+            switch (conn.source.id()) {
             case ModId::Controller:
                 gen = genController.get();
                 break;
@@ -1362,8 +1362,8 @@ void sfz::Synth::setupModMatrix()
             if (!gen)
                 continue;
 
-            ModMatrix::SourceId source = mm.registerSource(conn.first, *gen);
-            ModMatrix::TargetId target = mm.registerTarget(conn.second);
+            ModMatrix::SourceId source = mm.registerSource(conn.source, *gen);
+            ModMatrix::TargetId target = mm.registerTarget(conn.target);
 
             ASSERT(source);
             if (!source) {
@@ -1377,7 +1377,7 @@ void sfz::Synth::setupModMatrix()
                 continue;
             }
 
-            if (!mm.connect(source, target)) {
+            if (!mm.connect(source, target, conn.sourceDepth)) {
                 DBG("[sfizz] Failed to connect modulation source and target");
                 ASSERTFALSE;
             }
