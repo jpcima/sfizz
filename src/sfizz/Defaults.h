@@ -216,7 +216,7 @@ namespace Default
     constexpr Range<float> lfoDelayRange { 0.0, 30.0 };
     constexpr Range<float> lfoFadeRange { 0.0, 30.0 };
     constexpr Range<unsigned> lfoCountRange { 0, 1000 };
-    constexpr Range<unsigned> lfoStepsRange { 0, config::maxLFOSteps };
+    constexpr Range<unsigned> lfoStepsRange { 0, static_cast<unsigned>(config::maxLFOSteps) };
     constexpr Range<float> lfoStepXRange { -100.0, 100.0 };
     constexpr Range<int> lfoWaveRange { 0, 15 };
     constexpr Range<float> lfoOffsetRange { -1.0, 1.0 };
