@@ -25,8 +25,8 @@ struct LFO::Impl {
     size_t delayFramesLeft_ = 0;
     float fadeInPole_ = 0;
     float fadeInMemory_ = 0;
-    std::array<float, config::maxLFOSubs> subPhases_ {};
-    std::array<float, config::maxLFOSubs> sampleHoldMem_ {};
+    std::array<float, config::maxLFOSubs> subPhases_ {{}};
+    std::array<float, config::maxLFOSubs> sampleHoldMem_ {{}};
 };
 
 LFO::LFO()
