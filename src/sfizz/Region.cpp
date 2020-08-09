@@ -92,7 +92,10 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
             offsetCC[opcode.parameters.back()] = *value;
         break;
     case hash("end"):
-        setValueFromOpcode(opcode, sampleEnd, Default::sampleEndRange);
+        if (opcode.value == "-1")
+            sampleEnd = Default::sampleEndRange.getEnd();
+        else
+            setValueFromOpcode(opcode, sampleEnd, Default::sampleEndRange);
         break;
     case hash("count"):
         setValueFromOpcode(opcode, sampleCount, Default::sampleCountRange);
