@@ -27,6 +27,7 @@ jobs:
         packages:
         - libjack-jackd2-dev
         - libsndfile1-dev
+        - python3-numpy
     install: .travis/download_cmake.sh
     script: .travis/script_test.sh
 
@@ -37,6 +38,7 @@ jobs:
         packages:
         - libjack-jackd2-dev
         - libsndfile1-dev
+        - python3-numpy
     install: .travis/download_cmake.sh
     script: .travis/script_test.sh
 
