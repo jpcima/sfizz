@@ -12,3 +12,12 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       ..
 make -j$(nproc) sfizz_tests
 tests/sfizz_tests
+
+make -j$(nproc) sfizz_plot_lfo
+tests/sfizz_plot_lfo tests/lfo/lfo_waves.sfz > lfo_waves.dat
+tests/sfizz_plot_lfo tests/lfo/lfo_subwave.sfz > lfo_subwave.dat
+tests/sfizz_plot_lfo tests/lfo/lfo_fade_and_delay.sfz > lfo_fade_and_delay.dat
+
+tests/lfo/compare_lfo.py lfo_waves.dat tests/lfo/lfo_waves_reference.dat
+tests/lfo/compare_lfo.py lfo_subwave.dat tests/lfo/lfo_subwave_reference.dat
+tests/lfo/compare_lfo.py lfo_fade_and_delay.dat tests/lfo/lfo_fade_and_delay_reference.dat

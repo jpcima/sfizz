@@ -25,7 +25,7 @@
 
 //==============================================================================
 
-static constexpr double sampleRate = 44100.0; // sample rate used to compute
+static constexpr double sampleRate = 1000.0; // sample rate used to compute
 static constexpr double duration = 5.0; // length in seconds
 
 /**
