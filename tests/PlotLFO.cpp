@@ -25,7 +25,7 @@
 
 //==============================================================================
 
-static constexpr double sampleRate = 1000.0; // sample rate used to compute
+static constexpr double defaultSampleRate = 1000.0; // sample rate used to compute
 static constexpr double duration = 5.0; // length in seconds
 
 /**
@@ -33,7 +33,7 @@ static constexpr double duration = 5.0; // length in seconds
  */
 static void usage()
 {
-    std::cerr << "Usage: sfizz_plot_lfo <file.sfz>" "\n";
+    std::cerr << "Usage: sfizz_plot_lfo <file.sfz> <samplerate>" "\n";
 }
 
 static std::vector<sfz::LFODescription> lfoDescriptionFromSfzFile(const fs::path &sfzPath, bool &success)
@@ -61,7 +61,7 @@ static std::vector<sfz::LFODescription> lfoDescriptionFromSfzFile(const fs::path
  */
 int main(int argc, char* argv[])
 {
-    if (argc < 2 || argc > 2) {
+    if (argc < 2 || argc > 3) {
         usage();
         return 1;
     }
@@ -69,8 +69,16 @@ int main(int argc, char* argv[])
     fs::path sfzPath = argv[1];
     bool success = false;
     const std::vector<sfz::LFODescription> desc = lfoDescriptionFromSfzFile(sfzPath, success);
-    if (!success)
+    if (!success){
+        usage();
         return 1;
+    }
+
+    double sampleRate = defaultSampleRate;
+    if (argc == 3 && !absl::SimpleAtod(argv[2], &sampleRate)) {
+        usage();
+        return 1;
+    }
 
     size_t numLfos = desc.size();
     std::vector<sfz::LFO> lfos(numLfos);
