@@ -11,7 +11,7 @@ lfo1_phase=0.5
 lfo1_wave=3
 //
 lfo2_freq=1
-lfo2_phase=0.5
+lfo2_phase=180 // This should be the same as phase=0.5 in our parsing
 lfo2_wave=3
 lfo2_wave2=1
 //
