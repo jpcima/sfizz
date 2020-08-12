@@ -1736,6 +1736,30 @@ TEST_CASE("[Region] Parsing opcodes")
         region.parseOpcode({ "tune_stepcc120", "-2" });
         REQUIRE(view.at(120).step == 0.0f);
     }
+
+    SECTION("LFO phase (with ARIA workaround)")
+    {
+        region.parseOpcode({ "lfo1_phase", "0" });
+        REQUIRE(region.lfos[0].phase0 == 0.0f);
+        region.parseOpcode({ "lfo1_phase", "180" });
+        REQUIRE(region.lfos[0].phase0 == 0.5_a);
+        region.parseOpcode({ "lfo1_phase", "360" });
+        REQUIRE(region.lfos[0].phase0 == 0.0f); // wraps around
+        // ARIA workaround, which has non-standard interpretation in range 0-1
+        region.parseOpcode({ "lfo1_phase", "0.25" });
+        REQUIRE(region.lfos[0].phase0 == 0.25_a);
+        region.parseOpcode({ "lfo1_phase", "0.5" });
+        REQUIRE(region.lfos[0].phase0 == 0.5_a);
+        region.parseOpcode({ "lfo1_phase", "1.0" });
+        REQUIRE(region.lfos[0].phase0 == 0.0f); // wraps around
+        // hack to disable ARIA workaround
+        region.parseOpcode({ "lfo1_phase", "0.25d" });
+        REQUIRE(region.lfos[0].phase0 == Approx(0.25 / 360.0));
+        region.parseOpcode({ "lfo1_phase", "0.5d" });
+        REQUIRE(region.lfos[0].phase0 == Approx(0.5 / 360.0));
+        region.parseOpcode({ "lfo1_phase", u8"1.0°" });
+        REQUIRE(region.lfos[0].phase0 == Approx(1.0 / 360.0));
+    }
 }
 
 // Specific region bugs

@@ -804,7 +804,7 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
                 return false;
             if (!extendIfNecessary(lfos, lfoNumber, Default::numLFOs))
                 return false;
-            if (auto value = readOpcode(opcode.value, Default::lfoPhaseRange)) {
+            if (auto value = readAmbiguousPhaseFromOpcode(opcode)) {
                 float normalPhase = *value * (1.0 / 360.0);
                 normalPhase -= int(normalPhase);
                 normalPhase += (normalPhase < 0) ? 1 : 0;

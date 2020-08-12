@@ -13,6 +13,7 @@
 #include "absl/types/optional.h"
 #include "absl/meta/type_traits.h"
 #include "absl/strings/ascii.h"
+#include "absl/strings/match.h"
 #include "absl/strings/string_view.h"
 #include <vector>
 #include <type_traits>
@@ -115,6 +116,48 @@ private:
 absl::optional<uint8_t> readNoteValue(absl::string_view value);
 
 /**
+ * @brief Extract the leading character range which represents an integer number
+ *
+ * @param value
+ * @return absl::string_view
+ */
+inline absl::string_view readLeadingInteger(absl::string_view value)
+{
+    size_t numberEnd = 0;
+
+    if (numberEnd < value.size() && (value[numberEnd] == '+' || value[numberEnd] == '-'))
+        ++numberEnd;
+    while (numberEnd < value.size() && absl::ascii_isdigit(value[numberEnd]))
+        ++numberEnd;
+
+    return value.substr(0, numberEnd);
+}
+
+/**
+ * @brief Extract the leading character range which represents a real number
+ *
+ * @param value
+ * @return absl::string_view
+ */
+inline absl::string_view readLeadingReal(absl::string_view value)
+{
+    size_t numberEnd = 0;
+
+    if (numberEnd < value.size() && (value[numberEnd] == '+' || value[numberEnd] == '-'))
+        ++numberEnd;
+    while (numberEnd < value.size() && absl::ascii_isdigit(value[numberEnd]))
+        ++numberEnd;
+
+    if (numberEnd < value.size() && value[numberEnd] == '.') {
+        ++numberEnd;
+        while (numberEnd < value.size() && absl::ascii_isdigit(value[numberEnd]))
+            ++numberEnd;
+    }
+
+    return value.substr(0, numberEnd);
+}
+
+/**
  * @brief Read a value from the sfz file and cast it to the destination parameter along
  * with a proper clamping into range if needed. This particular template version acts on
  * integral target types, but can accept floats as an input.
@@ -127,14 +170,7 @@ absl::optional<uint8_t> readNoteValue(absl::string_view value);
 template <typename ValueType, absl::enable_if_t<std::is_integral<ValueType>::value, int> = 0>
 inline absl::optional<ValueType> readOpcode(absl::string_view value, const Range<ValueType>& validRange)
 {
-    size_t numberEnd = 0;
-
-    if (numberEnd < value.size() && (value[numberEnd] == '+' || value[numberEnd] == '-'))
-        ++numberEnd;
-    while (numberEnd < value.size() && absl::ascii_isdigit(value[numberEnd]))
-        ++numberEnd;
-
-    value = value.substr(0, numberEnd);
+    value = readLeadingInteger(value);
 
     int64_t returnedValue;
     if (!absl::SimpleAtoi(value, &returnedValue))
@@ -161,20 +197,7 @@ inline absl::optional<ValueType> readOpcode(absl::string_view value, const Range
 template <typename ValueType, absl::enable_if_t<std::is_floating_point<ValueType>::value, int> = 0>
 inline absl::optional<ValueType> readOpcode(absl::string_view value, const Range<ValueType>& validRange)
 {
-    size_t numberEnd = 0;
-
-    if (numberEnd < value.size() && (value[numberEnd] == '+' || value[numberEnd] == '-'))
-        ++numberEnd;
-    while (numberEnd < value.size() && absl::ascii_isdigit(value[numberEnd]))
-        ++numberEnd;
-
-    if (numberEnd < value.size() && value[numberEnd] == '.') {
-        ++numberEnd;
-        while (numberEnd < value.size() && absl::ascii_isdigit(value[numberEnd]))
-            ++numberEnd;
-    }
-
-    value = value.substr(0, numberEnd);
+    value = readLeadingReal(value);
 
     float returnedValue;
     if (!absl::SimpleAtof(value, &returnedValue))
@@ -196,6 +219,40 @@ inline absl::optional<bool> readBooleanFromOpcode(const Opcode& opcode)
     default:
         return {};
     }
+}
+
+/**
+ * @brief Read an angle value which may have different interpretation depending
+ *        on the SFZ implementation targeted by the instrument.
+ *
+ * The correction is desired for compatibility with some Garritan instruments.
+ *
+ * @param value
+ * @return angle value in degrees
+ */
+inline absl::optional<float> readAmbiguousPhaseFromOpcode(const Opcode& opcode)
+{
+    absl::string_view valueText = readLeadingReal(opcode.value);
+
+    float value;
+    if (!absl::SimpleAtof(valueText, &value))
+        return {};
+
+    // Cakewalk has lfoN_phase defined in 0-360, ARIA in 0-1
+    // if value lives in 0-1, most likely it's ARIA
+    bool isNormalized = value >= 0.0f && value <= 1.0f;
+
+    // other hack: trailing text can hint at degree units, to force standard behavior
+    auto trail = absl::string_view(opcode.value).substr(valueText.size());
+    if (absl::StartsWith(trail, "d") || absl::StartsWith(trail, u8"°"))
+        isNormalized = false;
+    else if (absl::StartsWith(trail, "n"))
+        isNormalized = true;
+
+    if (isNormalized)
+        value *= 360;
+
+    return value;
 }
 
 /**
