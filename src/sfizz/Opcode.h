@@ -239,8 +239,8 @@ inline absl::optional<float> readAmbiguousPhaseFromOpcode(const Opcode& opcode)
         return {};
 
     // Cakewalk has lfoN_phase defined in 0-360, ARIA in 0-1
-    // if value lives in 0-1, most likely it's ARIA
-    bool isNormalized = value >= 0.0f && value <= 1.0f;
+    // if value lives in 0-1, most likely it's ARIA (but also check the negative side)
+    bool isNormalized = value >= -1.0f && value <= 1.0f;
 
     // other hack: trailing text can hint at degree units, to force standard behavior
     auto trail = absl::string_view(opcode.value).substr(valueText.size());
