@@ -243,6 +243,7 @@ namespace Default
 	constexpr Range<int> egDepthRange { -12000, 12000 };
 	constexpr Range<float> egOnCCTimeRange { -100.0, 100.0 };
 	constexpr Range<float> egOnCCPercentRange { -100.0, 100.0 };
+    constexpr Range<float> pitchEgDepthRange { -12000.0, 12000.0 };
 
     // ***** SFZ v2 ********
     constexpr int sampleQuality { 2 };

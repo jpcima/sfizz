@@ -26,6 +26,12 @@ int ModIds::flags(ModId id) noexcept
         // sources
     case ModId::Controller:
         return kModIsPerCycle;
+    case ModId::AmpEG:
+        return kModIsPerVoice;
+    case ModId::PitchEG:
+        return kModIsPerVoice;
+    case ModId::FilEG:
+        return kModIsPerVoice;
     case ModId::Envelope:
         return kModIsPerVoice;
     case ModId::LFO:

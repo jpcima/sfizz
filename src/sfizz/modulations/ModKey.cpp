@@ -86,6 +86,12 @@ std::string ModKey::toString() const
         return absl::StrCat("Controller ", params_.cc,
             " {curve=", params_.curve, ", smooth=", params_.smooth,
             ", value=", params_.value, ", step=", params_.step, "}");
+    case ModId::AmpEG:
+        return "Amplitude EG";
+    case ModId::PitchEG:
+        return "Pitch EG";
+    case ModId::FilEG:
+        return "Filter EG";
     case ModId::Envelope:
         return absl::StrCat("EG ", 1 + params_.N);
     case ModId::LFO:

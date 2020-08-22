@@ -281,6 +281,18 @@ public:
      */
     LFO* getLFO(size_t index) { return lfos[index].get(); }
     /**
+     * @brief Get the Amplitude EG
+     */
+    ADSREnvelope<float>& getAmplitudeEG() { return amplitudeEG; }
+    /**
+     * @brief Get the Pitch EG
+     */
+    ADSREnvelope<float>& getPitchEG() { return pitchEG; }
+    /**
+     * @brief Get the Filter EG
+     */
+    ADSREnvelope<float>& getFilterEG() { return filterEG; }
+    /**
      * @brief Set the max number of filters per voice
      *
      * @param numFilters
@@ -459,7 +471,9 @@ private:
     std::vector<EQHolderPtr> equalizers;
     std::vector<std::unique_ptr<LFO>> lfos;
 
-    ADSREnvelope<float> egEnvelope;
+    ADSREnvelope<float> amplitudeEG;
+    ADSREnvelope<float> pitchEG;
+    ADSREnvelope<float> filterEG;
     float bendStepFactor { centsFactor(1) };
 
     WavetableOscillator waveOscillators[config::oscillatorsPerVoice];

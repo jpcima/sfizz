@@ -16,6 +16,7 @@
 #include "modulations/ModKey.h"
 #include "modulations/ModId.h"
 #include "modulations/sources/Controller.h"
+#include "modulations/sources/ADSR.h"
 #include "modulations/sources/LFO.h"
 #include "pugixml.hpp"
 #include "absl/algorithm/container.h"
@@ -43,6 +44,7 @@ sfz::Synth::Synth(int numVoices)
 
     // modulation sources
     genController.reset(new ControllerSource(resources));
+    genADSR.reset(new ADSRSource(*this));
     genLFO.reset(new LFOSource(*this));
 }
 
@@ -151,6 +153,15 @@ void sfz::Synth::buildRegion(const std::vector<Opcode>& regionOpcodes)
     lastRegion->getOrCreateConnection(
         ModKey::createCC(10, 1, defaultSmoothness, 100, 0),
         ModKey::createNXYZ(ModId::Pan, lastRegion->id));
+    lastRegion->getOrCreateConnection(
+        ModKey::createNXYZ(ModId::AmpEG, lastRegion->id),
+        ModKey::createNXYZ(ModId::Amplitude, lastRegion->id),
+        100.0f);
+    lastRegion->getOrCreateConnection(
+        ModKey::createNXYZ(ModId::PitchEG, lastRegion->id),
+        ModKey::createNXYZ(ModId::Pitch, lastRegion->id),
+        0.0f);
+    // TODO: the filter EG
 
     //
     auto parseOpcodes = [&](const std::vector<Opcode>& opcodes) {
@@ -1475,6 +1486,11 @@ void sfz::Synth::setupModMatrix()
             switch (conn.source.id()) {
             case ModId::Controller:
                 gen = genController.get();
+                break;
+            case ModId::AmpEG:
+            case ModId::PitchEG:
+            case ModId::FilEG:
+                gen = genADSR.get();
                 break;
             case ModId::LFO:
                 gen = genLFO.get();

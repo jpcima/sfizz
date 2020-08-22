@@ -238,6 +238,16 @@ struct Region {
      */
     bool parseOpcode(const Opcode& opcode);
     /**
+     * @brief Parse a opcode which is specific to a particular SFZv1 EG:
+     * ampeg, pitcheg, fileg.
+     *
+     * @param opcode
+     * @param target
+     * @return true if the opcode was properly read and stored.
+     * @return false
+     */
+    bool parseADSROpcode(const Opcode& opcode, EGDescription& target);
+    /**
      * @brief Process a generic CC opcode, and fill the modulation parameters.
      *
      * @param opcode
@@ -397,7 +407,7 @@ struct Region {
         float sourceDepth = 1.0f;
     };
     std::vector<Connection> connections;
-    Connection& getOrCreateConnection(const ModKey& source, const ModKey& target);
+    Connection& getOrCreateConnection(const ModKey& source, const ModKey& target, float sourceDepth = 1.0f);
 
     // Parent
     RegionSet* parent { nullptr };

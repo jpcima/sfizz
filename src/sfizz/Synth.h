@@ -27,6 +27,7 @@
 
 namespace sfz {
 class ControllerSource;
+class ADSRSource;
 class LFOSource;
 
 /**
@@ -303,6 +304,12 @@ public:
      * @param sampleRate
      */
     void setSampleRate(float sampleRate) noexcept;
+    /**
+     * @brief Get the sample rate.
+     *
+     * @return float
+     */
+    float getSampleRate() const noexcept { return sampleRate; }
     /**
      * @brief Get the default resampling quality for the given mode.
      *
@@ -807,6 +814,7 @@ private:
 
     // Modulation source generators
     std::unique_ptr<ControllerSource> genController;
+    std::unique_ptr<ADSRSource> genADSR;
     std::unique_ptr<LFOSource> genLFO;
 
     // Settings per voice

@@ -34,6 +34,7 @@ set (SFIZZ_HEADERS
     sfizz/modulations/ModKeyHash.h
     sfizz/modulations/ModMatrix.h
     sfizz/modulations/ModGenerator.h
+    sfizz/modulations/sources/ADSR.h
     sfizz/modulations/sources/Controller.h
     sfizz/modulations/sources/LFO.h
     sfizz/effects/impl/ResonantArray.h
@@ -143,6 +144,7 @@ set (SFIZZ_SOURCES
     sfizz/modulations/ModKeyHash.cpp
     sfizz/modulations/ModMatrix.cpp
     sfizz/modulations/sources/Controller.cpp
+    sfizz/modulations/sources/ADSR.cpp
     sfizz/modulations/sources/LFO.cpp
     sfizz/effects/Nothing.cpp
     sfizz/effects/Filter.cpp
