@@ -192,7 +192,6 @@ bool ModMatrix::connect(SourceId sourceId, TargetId targetId, float sourceDepth)
 void ModMatrix::init()
 {
     Impl& impl = *impl_;
-
     for (Impl::Source &source : impl.sources_) {
         const int flags = source.key.flags();
         if (flags & kModIsPerCycle)
@@ -205,8 +204,11 @@ void ModMatrix::initVoice(NumericId<Voice> voiceId, NumericId<Region> regionId, 
     Impl& impl = *impl_;
 
     for (Impl::Source &source : impl.sources_) {
+        if (source.key.region() != regionId)
+            continue;
+
         const int flags = source.key.flags();
-        if ((flags & kModIsPerVoice) && source.key.region() == regionId)
+        if (flags & kModIsPerVoice)
             source.gen->init(source.key, voiceId, delay);
     }
 }
@@ -216,8 +218,11 @@ void ModMatrix::releaseVoice(NumericId<Voice> voiceId, NumericId<Region> regionI
     Impl& impl = *impl_;
 
     for (Impl::Source &source : impl.sources_) {
+        if (source.key.region() != regionId)
+            continue;
+
         const int flags = source.key.flags();
-        if ((flags & kModIsPerVoice) && source.key.region() == regionId)
+        if (flags & kModIsPerVoice)
             source.gen->release(source.key, voiceId, delay);
     }
 }
@@ -260,11 +265,18 @@ void ModMatrix::beginVoice(NumericId<Voice> voiceId, NumericId<Region> regionId)
     impl.currentRegionId_ = regionId;
 
     for (Impl::Source &source : impl.sources_) {
+        if (source.key.region() != regionId)
+            continue;
+
         const int flags = source.key.flags();
         if (flags & kModIsPerVoice)
             source.bufferReady = false;
     }
+
     for (Impl::Target &target : impl.targets_) {
+        if (target.key.region() != regionId)
+            continue;
+
         const int flags = target.key.flags();
         if (flags & kModIsPerVoice)
             target.bufferReady = false;
@@ -279,9 +291,12 @@ void ModMatrix::endVoice()
     const NumericId<Region> regionId = impl.currentRegionId_;
 
     for (Impl::Source &source : impl.sources_) {
+        if (source.key.region() != regionId)
+            continue;
+
         if (!source.bufferReady) {
             const int flags = source.key.flags();
-            if ((flags & kModIsPerVoice) && source.key.region() == regionId) {
+            if (flags & kModIsPerVoice) {
                 absl::Span<float> buffer(source.buffer.data(), numFrames);
                 source.gen->generateDiscarded(source.key, voiceId, buffer);
             }
