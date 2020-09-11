@@ -292,8 +292,8 @@ void ModMatrix::beginVoice(NumericId<Voice> voiceId, NumericId<Region> regionId)
     impl.currentVoiceId_ = voiceId;
     impl.currentRegionId_ = regionId;
 
-    if (impl.sourceRegionIndex_.validId(regionId)
-        || impl.targetRegionIndex_.validId(regionId))
+    if (!impl.sourceRegionIndex_.validId(regionId)
+        || !impl.targetRegionIndex_.validId(regionId))
         return;
 
     for (auto idx: impl.sourceRegionIndex_[regionId]) {
