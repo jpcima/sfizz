@@ -28,7 +28,6 @@ set (SFIZZ_HEADERS
     sfizz/Curve.h
     sfizz/Debug.h
     sfizz/utility/NumericId.h
-    sfizz/utility/NumericIdVector.h
     sfizz/utility/SpinMutex.h
     sfizz/modulations/ModId.h
     sfizz/modulations/ModKey.h
