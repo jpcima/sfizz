@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -ex
-. .travis/environment.sh
+. scripts/travis/environment.sh
 
 cmake_dir="cmake-3.13.0-${TRAVIS_OS_NAME}-${TRAVIS_CPU_ARCH}"
 cmake_arc="${cmake_dir}.tar.gz"

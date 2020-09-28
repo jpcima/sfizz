@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -ex
-. .travis/docker_container.sh
+. scripts/travis/docker_container.sh
 
 buildenv bash -c "echo Hello from container" # ensure to start the container
 docker cp "$container":/etc/pacman.conf pacman.conf

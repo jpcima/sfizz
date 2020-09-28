@@ -5,9 +5,9 @@ set -ex
 test -z "$CONTAINER"
 
 if ! [ -z "$CONTAINER" ]; then
-  . .travis/docker_container.sh
+  . scripts/travis/docker_container.sh
 else
-  . .travis/no_container.sh
+  . scripts/travis/no_container.sh
 fi
 
 cd build
