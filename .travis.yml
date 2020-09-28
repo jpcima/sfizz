@@ -17,7 +17,7 @@ jobs:
         - wget
         - unzip
         - libsndfile-dev
-    install: .travis/download_vst_sdk.sh
+    install: scripts/travis/download_vst_sdk.sh
     script: scripts/run_clang_tidy.sh
 
   - name: "Linux amd64 tests"
@@ -27,8 +27,8 @@ jobs:
         packages:
         - libjack-jackd2-dev
         - libsndfile1-dev
-    install: .travis/download_cmake.sh
-    script: .travis/script_test.sh
+    install: scripts/travis/download_cmake.sh
+    script: scripts/travis/script_test.sh
 
   - name: "Linux arm64 tests"
     arch: arm64
@@ -37,8 +37,8 @@ jobs:
         packages:
         - libjack-jackd2-dev
         - libsndfile1-dev
-    install: .travis/download_cmake.sh
-    script: .travis/script_test.sh
+    install: scripts/travis/download_cmake.sh
+    script: scripts/travis/script_test.sh
 
   - name: "macOS"
     stage: "Build"
@@ -53,38 +53,38 @@ jobs:
         - dylibbundler
     env:
     - INSTALL_DIR="sfizz-${TRAVIS_BRANCH}-${TRAVIS_OS_NAME}-${TRAVIS_CPU_ARCH}"
-    script: .travis/script_osx.sh
-    after_success: .travis/prepare_osx.sh
+    script: scripts/travis/script_osx.sh
+    after_success: scripts/travis/prepare_osx.sh
 
   - name: "MOD devices arm"
     env:
     - CONTAINER=jpcima/mod-plugin-builder
     - CROSS_COMPILE=moddevices-arm
     - INSTALL_DIR="sfizz-${TRAVIS_BRANCH}-moddevices"
-    before_install: .travis/before_install_moddevices.sh
-    install: .travis/install_moddevices.sh
-    script: .travis/script_moddevices.sh
-    after_success: .travis/prepare_tarball.sh
+    before_install: scripts/travis/before_install_moddevices.sh
+    install: scripts/travis/install_moddevices.sh
+    script: scripts/travis/script_moddevices.sh
+    after_success: scripts/travis/prepare_tarball.sh
 
   - name: "Windows mingw32"
     env:
     - CROSS_COMPILE=mingw32
     - CONTAINER=archlinux
     - INSTALL_DIR="sfizz-${TRAVIS_BRANCH}-mingw32"
-    before_install: .travis/before_install_mingw.sh
-    install: .travis/install_mingw.sh
-    script: .travis/script_mingw.sh
-    after_success: .travis/prepare_tarball.sh
+    before_install: scripts/travis/before_install_mingw.sh
+    install: scripts/travis/install_mingw.sh
+    script: scripts/travis/script_mingw.sh
+    after_success: scripts/travis/prepare_tarball.sh
 
   - name: "Windows mingw64"
     env:
     - CROSS_COMPILE=mingw64
     - CONTAINER=archlinux
     - INSTALL_DIR="sfizz-${TRAVIS_BRANCH}-mingw64"
-    before_install: .travis/before_install_mingw.sh
-    install: .travis/install_mingw.sh
-    script: .travis/script_mingw.sh
-    after_success: .travis/prepare_tarball.sh
+    before_install: scripts/travis/before_install_mingw.sh
+    install: scripts/travis/install_mingw.sh
+    script: scripts/travis/script_mingw.sh
+    after_success: scripts/travis/prepare_tarball.sh
 
   - name: "Linux amd64 library"
     arch: amd64
@@ -95,9 +95,9 @@ jobs:
         packages:
         - libjack-jackd2-dev
         - libsndfile1-dev
-    install: .travis/download_cmake.sh
-    script: .travis/script_library.sh
-    after_success: .travis/prepare_tarball.sh
+    install: scripts/travis/download_cmake.sh
+    script: scripts/travis/script_library.sh
+    after_success: scripts/travis/prepare_tarball.sh
 
   - name: "Linux arm64 library"
     arch: arm64
@@ -108,9 +108,9 @@ jobs:
         packages:
         - libjack-jackd2-dev
         - libsndfile1-dev
-    install: .travis/download_cmake.sh
-    script: .travis/script_library.sh
-    after_success: .travis/prepare_tarball.sh
+    install: scripts/travis/download_cmake.sh
+    script: scripts/travis/script_library.sh
+    after_success: scripts/travis/prepare_tarball.sh
 
   - name: "Linux arm64 static plugins"
     arch: arm64
@@ -124,10 +124,10 @@ jobs:
         - libjack-jackd2-dev
         - libsndfile1-dev
     install:
-    - .travis/download_cmake.sh
-    - .travis/download_static_libs.sh
-    script: .travis/script_plugins.sh
-    after_success: .travis/prepare_tarball.sh
+    - scripts/travis/download_cmake.sh
+    - scripts/travis/download_static_libs.sh
+    script: scripts/travis/script_plugins.sh
+    after_success: scripts/travis/prepare_tarball.sh
 
   - name: "Linux amd64 static plugins"
     env:
@@ -149,10 +149,10 @@ jobs:
         - libxkbcommon-x11-dev
         - libxcb-keysyms1-dev
     install:
-    - .travis/download_cmake.sh
-    - .travis/download_static_libs.sh
-    script: .travis/script_plugins.sh
-    after_success: .travis/prepare_tarball.sh
+    - scripts/travis/download_cmake.sh
+    - scripts/travis/download_static_libs.sh
+    script: scripts/travis/script_plugins.sh
+    after_success: scripts/travis/prepare_tarball.sh
 
   - stage: "Deploy"
     name: "Source packaging"
@@ -166,24 +166,13 @@ jobs:
     install: sudo pip install git-archive-all
     script: git-archive-all --prefix="sfizz-${TRAVIS_BRANCH}/" -9 "${INSTALL_DIR}.tar.gz"
 
-  - name: "Generate documentation"
-    if: (tag IS present) AND (branch = master) AND (type = push)
-    addons:
-      apt:
-        packages:
-        - doxygen
-        - cmake
-        - libsndfile-dev
-    install: skip
-    script: .travis/update_dox.sh
-
   - name: "Discord Webhook"
     install: skip
-    script: bash ${TRAVIS_BUILD_DIR}/.travis/discord_webhook.sh success
+    script: bash ${TRAVIS_BUILD_DIR}/scripts/travis/discord_webhook.sh success
 
 # Signal discord on failure
 after_failure:
-- bash ${TRAVIS_BUILD_DIR}/.travis/discord_webhook.sh failure
+- bash ${TRAVIS_BUILD_DIR}/scripts/travis/discord_webhook.sh failure
 
 deploy:
   edge: true
