@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+echo "Number of CPU tasks: $(nproc)"
+
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release \
       -DSFIZZ_JACK=OFF \
