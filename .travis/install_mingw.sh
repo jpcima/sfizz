@@ -1,8 +1,16 @@
 #!/bin/bash
 
 set -ex
-. .travis/docker_container.sh
+. .travis/msys2_env.sh
 
-buildenv_as_root pacman -Sqyu --noconfirm
-buildenv_as_root pacman -Sq --noconfirm base-devel wget mingw-w64-cmake mingw-w64-gcc mingw-w64-pkg-config mingw-w64-libsndfile
-buildenv i686-w64-mingw32-gcc -v && buildenv i686-w64-mingw32-g++ -v && buildenv i686-w64-mingw32-cmake --version
+#$msys2 pacman --sync --quiet --refresh --sysupgrade --noconfirm
+
+$msys2 pacman --sync --quiet --noconfirm --needed \
+       mingw-w64-"$CI_ARCH"-toolchain \
+       mingw-w64-"$CI_ARCH"-cmake \
+       mingw-w64-"$CI_ARCH"-libsndfile
+
+## Install more MSYS2 packages from https://packages.msys2.org/base here
+taskkill //IM gpg-agent.exe //F || true # https://travis-ci.community/t/4967
+
+$mingw gcc -v && $mingw g++ -v && $mingw cmake --version
