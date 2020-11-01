@@ -3,8 +3,10 @@ set -ex
 
 mkdir -p build/${INSTALL_DIR} && cd build
 cmake -DCMAKE_BUILD_TYPE=Release \
+      -DSFIZZ_USE_SNDFILE=OFF \
       -DSFIZZ_VST=ON \
       -DSFIZZ_AU=ON \
+      -DSFIZZ_JACK=OFF \
       -DSFIZZ_TESTS=OFF \
       -DCMAKE_CXX_STANDARD=14 \
       -DLV2PLUGIN_INSTALL_DIR=/Library/Audio/Plug-Ins/LV2 \

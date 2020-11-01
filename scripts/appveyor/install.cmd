@@ -4,4 +4,4 @@ REM cd c:\tools\vcpkg\
 REM git pull
 REM .\bootstrap-vcpkg.bat
 REM cd %APPVEYOR_BUILD_FOLDER%
-vcpkg install libsndfile:%VCPKG_TRIPLET%
+REM vcpkg install libsndfile:%VCPKG_TRIPLET%

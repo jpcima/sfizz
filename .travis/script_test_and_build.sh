@@ -3,6 +3,7 @@ set -ex
 
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release \
+      -DSFIZZ_USE_SNDFILE=OFF \
       -DSFIZZ_JACK=ON \
       -DSFIZZ_VST=ON \
       -DSFIZZ_LV2_UI=ON \
@@ -10,6 +11,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DSFIZZ_SHARED=OFF \
       -DSFIZZ_STATIC_DEPENDENCIES=OFF \
       -DSFIZZ_LV2=ON \
+      -DSFIZZ_RENDER=OFF \
       -DCMAKE_CXX_STANDARD=17 \
       ..
 make -j2 sfizz_tests

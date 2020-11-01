@@ -28,7 +28,6 @@ for:
   - cmake --version
   - gcc -v
   install:
-  - brew install jack
   - brew install dylibbundler
   before_build:
   - chmod +x ${APPVEYOR_BUILD_FOLDER}/scripts/appveyor/before_build.sh
