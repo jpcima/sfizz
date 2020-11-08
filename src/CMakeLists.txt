@@ -138,6 +138,7 @@ set (SFIZZ_SOURCES
     sfizz/Wavetables.cpp
     sfizz/Tuning.cpp
     sfizz/RegionSet.cpp
+    sfizz/Defaults.cpp
     sfizz/PolyphonyGroup.cpp
     sfizz/VoiceManager.cpp
     sfizz/VoiceStealing.cpp

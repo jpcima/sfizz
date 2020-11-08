@@ -139,6 +139,10 @@ namespace config {
      */
     static constexpr float overflowVoiceMultiplier { 1.5f };
     static_assert(overflowVoiceMultiplier >= 1.0f, "This needs to add voices");
+    /**
+     * @brief The smoothing time constant per "smooth" steps
+     */
+    constexpr float smoothTauPerStep { 3e-3 };
 } // namespace config
 
 } // namespace sfz
