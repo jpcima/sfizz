@@ -60,9 +60,19 @@ tresult PLUGIN_API SfizzVstControllerNoUi::initialize(FUnknown* context)
             Steinberg::String("Stretched tuning"), pid++, nullptr,
             0, Vst::ParameterInfo::kCanAutomate, Vst::kRootUnitId));
 
+    // MIDI parameter flags
+    int32 midiFlags = Vst::ParameterInfo::kCanAutomate;
+    //int32 midiFlags = Vst::ParameterInfo::kNoFlags;
+
     // MIDI special controllers
-    parameters.addParameter(Steinberg::String("Aftertouch"), nullptr, 0, 0.5, 0, pid++, Vst::kRootUnitId);
-    parameters.addParameter(Steinberg::String("Pitch bend"), nullptr, 0, 0.5, 0, pid++, Vst::kRootUnitId);
+    parameters.addParameter(
+        SfizzRange::getForParameter(kPidMidiAftertouch).createParameter(
+            Steinberg::String("Aftertouch"), pid++, nullptr,
+            0, midiFlags, Vst::kRootUnitId));
+    parameters.addParameter(
+        SfizzRange::getForParameter(kPidMidiPitchBend).createParameter(
+            Steinberg::String("Pitch bend"), pid++, nullptr,
+            0, midiFlags, Vst::kRootUnitId));
 
     // MIDI controllers
     for (unsigned i = 0; i < kNumControllerParams; ++i) {
@@ -70,10 +80,10 @@ tresult PLUGIN_API SfizzVstControllerNoUi::initialize(FUnknown* context)
         Steinberg::String shortTitle;
         title.printf("Controller %u", i);
         shortTitle.printf("CC%u", i);
-
         parameters.addParameter(
-            title, nullptr, 0, 0, Vst::ParameterInfo::kNoFlags,
-            pid++, Vst::kRootUnitId, shortTitle);
+            SfizzRange::getForParameter(kPidMidiCC0 + i).createParameter(
+                title, pid++, nullptr, 0, midiFlags,
+                Vst::kRootUnitId, shortTitle));
     }
 
     return kResultTrue;

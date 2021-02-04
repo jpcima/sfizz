@@ -225,7 +225,13 @@ void PLUGIN_API SfizzVstEditor::update(FUnknown* changedUnknown, int32 message)
         case kPidStretchedTuning:
             uiReceiveValue(EditId::StretchTuning, range.denormalize(value));
             break;
-        }
+        default:
+            if (id >= kPidMidiCC0 && id <= kPidMidiCCLast) {
+                unsigned cc = id - kPidMidiCC0;
+                fprintf(stderr, "Controller Parameter Change: %d\n", cc);
+            }
+            break;
+       }
         return;
     }
 
