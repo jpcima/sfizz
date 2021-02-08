@@ -1,8 +1,11 @@
 add_library(plugins-common STATIC EXCLUDE_FROM_ALL
     "common/plugin/MessageUtils.h"
-    "common/plugin/MessageUtils.cpp")
+    "common/plugin/MessageUtils.cpp"
+    "common/plugin/SynthQuery.h"
+    "common/plugin/SynthQuery.cpp")
 target_include_directories(plugins-common PUBLIC "common")
 target_link_libraries(plugins-common
+    PUBLIC sfizz::sfizz
     PUBLIC sfizz::spin_mutex
     PUBLIC absl::strings)
 add_library(sfizz::plugins-common ALIAS plugins-common)
