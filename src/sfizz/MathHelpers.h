@@ -160,6 +160,30 @@ inline constexpr T fastFmod(T x, T m)
     return x - m * static_cast<int>(x / m);
 }
 
+/**
+ * @brief Compute the floating-point power (pow)
+ *
+ * The approximation is within an absolute margin 0.03 with @p a and @p b varied
+ * in the domain ]0;1[, excluding the special case (0,0) which is unspecified.
+ *
+ * @param a
+ * @param b
+ * @return double
+ */
+inline double fastPow(double a, double b) {
+#if SFIZZ_CPU_ENDIAN_LITTLE
+  enum { lo, hi };
+#elif SFIZZ_CPU_ENDIAN_BIG
+  enum { hi, lo };
+#endif
+  // Reference: https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
+  union { double d; int32_t x[2]; } u;
+  u.d = a;
+  u.x[hi] = (int32_t)(b * (u.x[1] - 1072632447) + 1072632447);
+  u.x[lo] = 0;
+  return a ? u.d : 0.0;
+}
+
 template <int Increment = 1, class T>
 inline CXX14_CONSTEXPR void incrementAll(T& only)
 {

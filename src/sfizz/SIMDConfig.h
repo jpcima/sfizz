@@ -116,3 +116,20 @@
 #elif defined(__arm__) || defined(__arm)
 #   define SFIZZ_CPU_FAMILY_ARM 1
 #endif
+
+/**
+   Detect one of the following processor endianness.
+
+   - SFIZZ_CPU_ENDIAN_LITTLE
+   - SFIZZ_CPU_ENDIAN_BIG
+ */
+
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#   define SFIZZ_CPU_ENDIAN_LITTLE 1
+#elif defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#   define SFIZZ_CPU_ENDIAN_BIG 1
+#elif defined(_WIN32)
+#   define SFIZZ_CPU_ENDIAN_LITTLE 1
+#else
+#   error Cannot detect processor endianness
+#endif

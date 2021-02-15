@@ -68,3 +68,31 @@ TEST_CASE("[FloatMath] Nan/Inf checker")
     REQUIRE(!fp_naninf(-1.0f));
     REQUIRE(!fp_naninf(-1.0));
 }
+
+TEST_CASE("[FloatMath] Fast pow")
+{
+    double step = 0.01;
+    double maxAbsErr = 0.0;
+    double meanAbsErr = 0.0;
+    size_t count = 0;
+
+    for (double a = 0.0; a <= 1.0; a += step) {
+        for (double b = 0.0; b <= 1.0; b += step) {
+            if (a == 0 & b == 0)
+                continue;
+
+            double ref = std::pow(a, b);
+            double approx = fastPow(a, b);
+
+            double absErr = std::fabs(approx - ref);
+            maxAbsErr = std::max(maxAbsErr, absErr);
+            meanAbsErr += absErr;
+
+            ++count;
+        }
+    }
+    meanAbsErr /= count;
+
+    REQUIRE(maxAbsErr < 0.03);
+    REQUIRE(meanAbsErr < 0.01);
+}
