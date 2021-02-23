@@ -60,6 +60,7 @@ private:
 
     // misc
     static void loadSfzFileOrDefault(sfz::Sfizz& synth, const std::string& filePath);
+    static void loadScalaFileOrDefault(sfz::Sfizz& synth, const std::string& filePath);
 
     // note event tracking
     std::array<float, 128> _noteEventsCurrentCycle; // 0: off, >0: on, <0: no change

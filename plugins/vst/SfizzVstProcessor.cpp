@@ -25,6 +25,22 @@ static const char defaultSfzText[] =
     "<region>sample=*sine" "\n"
     "ampeg_attack=0.02 ampeg_release=0.1" "\n";
 
+static const char defaultScalaText[] =
+    "Equal temperament" "\n"
+    "12" "\n"
+    "100.0" "\n"
+    "200.0" "\n"
+    "300.0" "\n"
+    "400.0" "\n"
+    "500.0" "\n"
+    "600.0" "\n"
+    "700.0" "\n"
+    "800.0" "\n"
+    "900.0" "\n"
+    "1000.0" "\n"
+    "1100.0" "\n"
+    "1200.0" "\n";
+
 enum {
     kMidiEventMaximumSize = 4,
     kOscTempSize = 8192,
@@ -167,7 +183,7 @@ void SfizzVstProcessor::syncStateToSynth()
     synth->setNumVoices(_state.numVoices);
     synth->setOversamplingFactor(1 << _state.oversamplingLog2);
     synth->setPreloadSize(_state.preloadSize);
-    synth->loadScalaFile(_state.scalaFile);
+    loadScalaFileOrDefault(*synth, _state.scalaFile);
     synth->setScalaRootKey(_state.scalaRootKey);
     synth->setTuningFrequency(_state.tuningFrequency);
     synth->loadStretchTuningByRatio(_state.stretchedTuning);
@@ -571,7 +587,7 @@ tresult PLUGIN_API SfizzVstProcessor::notify(Vst::IMessage* message)
 
         std::unique_lock<SpinMutex> lock(_processMutex);
         _state.scalaFile.assign(static_cast<const char *>(data), size);
-        _synth->loadScalaFile(_state.scalaFile);
+        loadScalaFileOrDefault(*_synth, _state.scalaFile);
         lock.unlock();
 
         Steinberg::OPtr<Vst::IMessage> reply { allocateMessage() };
@@ -619,6 +635,18 @@ void SfizzVstProcessor::loadSfzFileOrDefault(sfz::Sfizz& synth, const std::strin
         synth.loadSfzString("default.sfz", defaultSfzText);
 }
 
+void SfizzVstProcessor::loadScalaFileOrDefault(sfz::Sfizz& synth, const std::string& filePath)
+{
+    if (!filePath.empty()) {
+        if (!synth.loadScalaFile(filePath)) {
+            // reload equal temperament on failure
+            synth.loadScalaString(defaultScalaText);
+        }
+    }
+    else
+        synth.loadScalaString(defaultScalaText);
+}
+
 void SfizzVstProcessor::doBackgroundWork()
 {
     for (;;) {
@@ -664,7 +692,7 @@ void SfizzVstProcessor::doBackgroundWork()
             else if (_synth->shouldReloadScala()) {
                 fprintf(stderr, "[Sfizz] scala file has changed, reloading\n");
                 std::lock_guard<SpinMutex> lock(_processMutex);
-                _synth->loadScalaFile(_state.scalaFile);
+                loadScalaFileOrDefault(*_synth, _state.scalaFile);
             }
         }
         else if (!std::strcmp(id, "NotifyPlayState")) {
