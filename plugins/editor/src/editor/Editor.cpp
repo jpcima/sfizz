@@ -108,6 +108,7 @@ struct Editor::Impl : EditorController::Receiver, IControlListener {
     CControl *stretchedTuningSlider_ = nullptr;
     CTextLabel* stretchedTuningLabel_ = nullptr;
     CTextLabel* keyswitchLabel_ = nullptr;
+    CTextLabel* keyswitchNoteLabel_ = nullptr;
 
     STitleContainer* userFilesGroup_ = nullptr;
     STextButton* userFilesDirButton_ = nullptr;
@@ -592,8 +593,8 @@ void Editor::Impl::createFrameContents()
         darkTheme.titleBoxBackground = { 0xba, 0xbd, 0xb6 };
         darkTheme.icon = darkTheme.text;
         darkTheme.iconHighlight = { 0xfd, 0x98, 0x00 };
-        darkTheme.valueText = { 0x2e, 0x34, 0x36 };
-        darkTheme.valueBackground = { 0xff, 0xff, 0xff };
+        darkTheme.valueText = { 0x00, 0x00, 0x00 };
+        darkTheme.valueBackground = { 0x9a, 0x9a, 0x9a };
         darkTheme.knobActiveTrackColor = { 0x00, 0xb6, 0x2a };
         darkTheme.knobInactiveTrackColor = { 0x60, 0x60, 0x60 };
         darkTheme.knobLineIndicatorColor = { 0xff, 0xff, 0xff };
@@ -659,6 +660,18 @@ void Editor::Impl::createFrameContents()
             lbl->setBackColor(CColor(0x00, 0x00, 0x00, 0x00));
             lbl->setFontColor(theme->text);
             lbl->setHoriAlign(align);
+            auto font = makeOwned<CFontDesc>("Roboto", fontsize);
+            lbl->setFont(font);
+            return lbl;
+        };
+        auto createBadge = [&theme](const CRect& bounds, int, const char* label, CHoriTxtAlign align, int fontsize) {
+            CTextLabel* lbl = new CTextLabel(bounds, label);
+            lbl->setFrameColor(CColor(0x00, 0x00, 0x00, 0x00));
+            lbl->setBackColor(theme->valueBackground);
+            lbl->setFontColor(theme->valueText);
+            lbl->setHoriAlign(align);
+            lbl->setStyle(CParamDisplay::kRoundRectStyle);
+            lbl->setRoundRectRadius(5.0);
             auto font = makeOwned<CFontDesc>("Roboto", fontsize);
             lbl->setFont(font);
             return lbl;
