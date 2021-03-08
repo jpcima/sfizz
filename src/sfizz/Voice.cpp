@@ -213,6 +213,10 @@ struct Voice::Impl
     std::vector<std::unique_ptr<LFO>> lfos_;
     std::vector<std::unique_ptr<FlexEnvelope>> flexEGs_;
 
+    std::unique_ptr<LFO> lfoAmplitude_;
+    std::unique_ptr<LFO> lfoPitch_;
+    std::unique_ptr<LFO> lfoFilter_;
+
     ADSREnvelope egAmplitude_;
     std::unique_ptr<ADSREnvelope> egPitch_;
     std::unique_ptr<ADSREnvelope> egFilter_;
@@ -555,6 +559,12 @@ void Voice::setSampleRate(float sampleRate) noexcept
         eg->setSampleRate(sampleRate);
 
     for (auto& lfo : impl.lfos_)
+        lfo->setSampleRate(sampleRate);
+    if (auto* lfo = impl.lfoAmplitude_.get())
+        lfo->setSampleRate(sampleRate);
+    if (auto* lfo = impl.lfoPitch_.get())
+        lfo->setSampleRate(sampleRate);
+    if (auto* lfo = impl.lfoFilter_.get())
         lfo->setSampleRate(sampleRate);
 
     for (auto& filter : impl.filters_)
@@ -1571,6 +1581,45 @@ void Voice::setFilterEGEnabledPerVoice(bool haveFilterEG)
         impl.egFilter_.reset(new ADSREnvelope);
     else
         impl.egFilter_.reset();
+}
+
+void Voice::setAmplitudeLFOEnabledPerVoice(bool haveAmplitudeLFO)
+{
+    Impl& impl = *impl_;
+    Resources& res = impl.resources_;
+    if (haveAmplitudeLFO) {
+        LFO* lfo = new LFO(, &res.bufferPool, &res.modMatrix);
+        impl.lfoAmplitude_.reset(lfo);
+        lfo->setSampleRate(impl.sampleRate_);
+    }
+    else
+        impl.lfoAmplitude_.reset();
+}
+
+void Voice::setPitchLFOEnabledPerVoice(bool havePitchLFO)
+{
+    Impl& impl = *impl_;
+    Resources& res = impl.resources_;
+    if (havePitchLFO) {
+        LFO* lfo = new LFO(, &res.bufferPool, &res.modMatrix);
+        impl.lfoPitch_.reset(lfo);
+        lfo->setSampleRate(impl.sampleRate_);
+    }
+    else
+        impl.lfoPitch_.reset();
+}
+
+void Voice::setFilterLFOEnabledPerVoice(bool haveFilterLFO)
+{
+    Impl& impl = *impl_;
+    Resources& res = impl.resources_;
+    if (haveFilterLFO) {
+        LFO* lfo = new LFO(, &res.bufferPool, &res.modMatrix);
+        impl.lfoFilter_.reset(lfo);
+        lfo->setSampleRate(impl.sampleRate_);
+    }
+    else
+        impl.lfoFilter_.reset();
 }
 
 void Voice::Impl::setupOscillatorUnison()

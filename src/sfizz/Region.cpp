@@ -744,6 +744,55 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
         break;
 
     // Modulation: LFO
+    case hash("amplfo_delay"):
+    case hash("amplfo_depth"):
+    case hash("amplfo_depth_oncc&"): // also amplfo_depthcc&
+    case hash("amplfo_depthchanaft"):
+    case hash("amplfo_depthpolyaft"):
+    case hash("amplfo_fade"):
+    case hash("amplfo_freq"):
+    case hash("amplfo_freq_oncc&"): // also amplfo_freqcc&
+    case hash("amplfo_freqchanaft"):
+    case hash("amplfo_freqpolyaft"):
+        if (parseLFOOpcode(opcode, amplitudeLFO))
+            getOrCreateConnection(
+                ModKey::createNXYZ(ModId::AmpLFO, id),
+                ModKey::createNXYZ(ModId::Amplitude, id));
+        break;
+
+    case hash("pitchlfo_delay"):
+    case hash("pitchlfo_depth"):
+    case hash("pitchlfo_depth_oncc&"): // also pitchlfo_depthcc&
+    case hash("pitchlfo_depthchanaft"):
+    case hash("pitchlfo_depthpolyaft"):
+    case hash("pitchlfo_fade"):
+    case hash("pitchlfo_freq"):
+    case hash("pitchlfo_freq_oncc&"): // also pitchlfo_freqcc&
+    case hash("pitchlfo_freqchanaft"):
+    case hash("pitchlfo_freqpolyaft"):
+        if (parseLFOOpcode(opcode, pitchLFO))
+            getOrCreateConnection(
+                ModKey::createNXYZ(ModId::PitchLFO, id),
+                ModKey::createNXYZ(ModId::Pitch, id));
+        break;
+
+    case hash("fillfo_delay"):
+    case hash("fillfo_depth"):
+    case hash("fillfo_depth_oncc&"): // also fillfo_depthcc&
+    case hash("fillfo_depthchanaft"):
+    case hash("fillfo_depthpolyaft"):
+    case hash("fillfo_fade"):
+    case hash("fillfo_freq"):
+    case hash("fillfo_freq_oncc&"): // also fillfo_freqcc&
+    case hash("fillfo_freqchanaft"):
+    case hash("fillfo_freqpolyaft"):
+        if (parseLFOOpcode(opcode, filterLFO))
+            getOrCreateConnection(
+                ModKey::createNXYZ(ModId::FilLFO, id),
+                ModKey::createNXYZ(ModId::FilCutoff, id));
+        break;
+
+    // Modulation: LFO
     case hash("lfo&_freq"):
         {
             const auto lfoNumber = opcode.parameters.front();
@@ -1393,6 +1442,63 @@ bool sfz::Region::parseEGOpcode(const Opcode& opcode, EGDescription& eg)
     return true;
 
     #undef case_any_eg
+}
+
+bool sfz::Region::parseLFOOpcode(const Opcode& opcode, EGDescription& eg)
+{
+    #define case_any_lfo(param)                      \
+        case hash("amplfo_" param):                  \
+        case hash("pitchlfo_" param):                \
+        case hash("fillfo_" param)                   \
+
+    switch (opcode.lettersOnlyHash) {
+    case_any_lfo("delay"):
+        // TODO
+        
+        break;
+    case_any_lfo("depth"):
+        // TODO
+        
+        break;
+    case_any_lfo("depth_oncc&"): // also depthcc&
+        // TODO
+        
+        break;
+    case_any_lfo("depthchanaft"):
+        // TODO
+        
+        break;
+    case_any_lfo("depthpolyaft"):
+        // TODO
+        
+        break;
+    case_any_lfo("fade"):
+        // TODO
+        
+        break;
+    case_any_lfo("freq"):
+        // TODO
+        
+        break;
+    case_any_lfo("freq_oncc&"): // also freqcc&
+        // TODO
+        
+        break;
+    case_any_lfo("freqchanaft"):
+        // TODO
+        
+        break;
+    case_any_lfo("freqpolyaft"):
+        // TODO
+        
+        break;
+    default:
+        return false;
+    }
+
+    return true;
+
+    #undef case_any_lfo
 }
 
 bool sfz::Region::parseEGOpcode(const Opcode& opcode, absl::optional<EGDescription>& eg)

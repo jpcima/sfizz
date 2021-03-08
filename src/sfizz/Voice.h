@@ -306,6 +306,24 @@ public:
      */
     void setFilterEGEnabledPerVoice(bool haveFilterEG);
     /**
+     * @brief Set whether SFZv1 amplitude LFO is enabled on this voice
+     *
+     * @param haveAmplitudeLFO
+     */
+    void setAmplitudeLFOEnabledPerVoice(bool haveAmplitudeLFO);
+    /**
+     * @brief Set whether SFZv1 pitch LFO is enabled on this voice
+     *
+     * @param havePitchLFO
+     */
+    void setPitchLFOEnabledPerVoice(bool havePitchLFO);
+    /**
+     * @brief Set whether SFZv1 filter LFO is enabled on this voice
+     *
+     * @param haveFilterLFO
+     */
+    void setFilterLFOEnabledPerVoice(bool haveFilterLFO);
+    /**
      * @brief Release the voice after a given delay
      *
      * @param delay
