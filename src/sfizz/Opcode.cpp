@@ -162,15 +162,15 @@ absl::optional<T> readInt_(OpcodeSpec<T> spec, absl::string_view v)
         return absl::nullopt;
 
     if (returnedValue > static_cast<int64_t>(spec.bounds.getEnd())) {
+        if (spec.flags & kIsResetAboveUpperBound)
+            return absl::nullopt;
         if (spec.flags & kEnforceUpperBound)
             return spec.bounds.getEnd();
-
-        return absl::nullopt;
     } else if (returnedValue < static_cast<int64_t>(spec.bounds.getStart())) {
+        if (spec.flags & kIsResetBelowLowerBound)
+            return absl::nullopt;
         if (spec.flags & kEnforceLowerBound)
             return spec.bounds.getStart();
-
-        return absl::nullopt;
     }
 
     return static_cast<T>(returnedValue);
@@ -192,6 +192,17 @@ INSTANTIATE_FOR_INTEGRAL(int32_t)
 INSTANTIATE_FOR_INTEGRAL(int64_t)
 
 
+///
+static bool ConvertStringToFloat(absl::string_view string, float* value)
+{
+    return absl::SimpleAtof(string, value);
+}
+static bool ConvertStringToFloat(absl::string_view string, double* value)
+{
+    return absl::SimpleAtod(string, value);
+}
+
+///
 template <typename T>
 absl::optional<T> readFloat_(OpcodeSpec<T> spec, absl::string_view v)
 {
@@ -210,22 +221,22 @@ absl::optional<T> readFloat_(OpcodeSpec<T> spec, absl::string_view v)
 
     v = v.substr(0, numberEnd);
 
-    float returnedValue;
-    if (!absl::SimpleAtof(v, &returnedValue))
+    T returnedValue;
+    if (!ConvertStringToFloat(v, &returnedValue))
         return absl::nullopt;
 
     if (spec.flags & kWrapPhase)
         returnedValue = wrapPhase(returnedValue);
-    else if (returnedValue > static_cast<int64_t>(spec.bounds.getEnd())) {
+    else if (returnedValue > spec.bounds.getEnd()) {
+        if (spec.flags & kIsResetAboveUpperBound)
+            return absl::nullopt;
         if (spec.flags & kEnforceUpperBound)
             return spec.bounds.getEnd();
-
-        return absl::nullopt;
-    } else if (returnedValue < static_cast<int64_t>(spec.bounds.getStart())) {
+    } else if (returnedValue < spec.bounds.getStart()) {
+        if (spec.flags & kIsResetBelowLowerBound)
+            return absl::nullopt;
         if (spec.flags & kEnforceLowerBound)
             return spec.bounds.getStart();
-
-        return absl::nullopt;
     }
 
     return spec.normalizeInput(returnedValue);

@@ -50,11 +50,15 @@ enum OpcodeFlags : int {
     kCanBeNote = 1,
     kEnforceLowerBound = 1 << 1,
     kEnforceUpperBound = 1 << 2,
-    kNormalizePercent = 1 << 3,
-    kNormalizeMidi = 1 << 4,
-    kNormalizeBend = 1 << 5,
-    kWrapPhase = 1 << 6,
-    kDb2Mag = 1 << 7,
+    kEnforceBounds = kEnforceLowerBound|kEnforceUpperBound,
+    kIsResetAboveUpperBound = 1 << 3,
+    kIsResetBelowLowerBound = 1 << 4,
+    kIsResetOutsideBounds = kIsResetAboveUpperBound|kIsResetBelowLowerBound,
+    kNormalizePercent = 1 << 5,
+    kNormalizeMidi = 1 << 6,
+    kNormalizeBend = 1 << 7,
+    kWrapPhase = 1 << 8,
+    kDb2Mag = 1 << 9,
 };
 
 template<class T>
@@ -145,8 +149,12 @@ namespace Default
     extern const OpcodeSpec<float> hiVel;
     extern const OpcodeSpec<float> loCC;
     extern const OpcodeSpec<float> hiCC;
+    extern const OpcodeSpec<float> loHDCC;
+    extern const OpcodeSpec<float> hiHDCC;
     extern const OpcodeSpec<float> loBend;
     extern const OpcodeSpec<float> hiBend;
+    extern const OpcodeSpec<float> loRand;
+    extern const OpcodeSpec<float> hiRand;
     extern const OpcodeSpec<float> loNormalized;
     extern const OpcodeSpec<float> hiNormalized;
     extern const OpcodeSpec<float> loBipolar;

@@ -314,10 +314,10 @@ TEST_CASE("[Opcode] opcode read (uint8_t)")
         REQUIRE( opcode.read(spec) == 16);
     }
 
-    SECTION("Ignore")
+    SECTION("Reset below bounds")
     {
-        Opcode opcode { "", "110" };
-        OpcodeSpec<uint8_t> spec { 0, Range<uint8_t>(0, 100), 0 };
+        Opcode opcode { "", "-1" };
+        OpcodeSpec<uint8_t> spec { 50, Range<uint8_t>(0, 100), kIsResetBelowLowerBound };
         REQUIRE( opcode.read(spec) == spec.defaultInputValue );
     }
 
@@ -456,10 +456,10 @@ TEST_CASE("[Opcode] opcode read (float)")
         REQUIRE( opcode.read(spec) == -16.4_a);
     }
 
-    SECTION("Ignore")
+    SECTION("Reset below bounds")
     {
-        Opcode opcode { "", "110" };
-        OpcodeSpec<float> spec { 0.0f, Range<float>(-100.0f, 100.0f), 0 };
+        Opcode opcode { "", "-1" };
+        OpcodeSpec<float> spec { 50.0f, Range<float>(0.0f, 100.0f), kIsResetBelowLowerBound };
         REQUIRE( opcode.read(spec) == spec.defaultInputValue );
     }
 

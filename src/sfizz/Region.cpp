@@ -238,14 +238,14 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         ccConditions[opcode.parameters.back()].setStart(
-            opcode.read(Default::loNormalized)
+            opcode.read(Default::loHDCC)
         );
         break;
     case hash("hihdcc&"): // also hirealcc&
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         ccConditions[opcode.parameters.back()].setEnd(
-            opcode.read(Default::hiNormalized)
+            opcode.read(Default::hiHDCC)
         );
         break;
     case hash("sw_lokey"): // fallthrough
@@ -326,10 +326,10 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
         bpmRange.setEnd(opcode.read(Default::hiBPM));
         break;
     case hash("lorand"):
-        randRange.setStart(opcode.read(Default::loNormalized));
+        randRange.setStart(opcode.read(Default::loRand));
         break;
     case hash("hirand"):
-        randRange.setEnd(opcode.read(Default::hiNormalized));
+        randRange.setEnd(opcode.read(Default::hiRand));
         break;
     case hash("seq_length"):
         sequenceLength = opcode.read(Default::sequence);
@@ -363,14 +363,14 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
             return false;
         triggerOnCC = true;
         ccTriggers[opcode.parameters.back()].setStart(
-            opcode.read(Default::loNormalized)
+            opcode.read(Default::loHDCC)
         );
         break;
     case hash("start_hihdcc&"): // also on_hihdcc&
         if (opcode.parameters.back() >= config::numCCs)
             return false;
         ccTriggers[opcode.parameters.back()].setEnd(
-            opcode.read(Default::hiNormalized)
+            opcode.read(Default::hiHDCC)
         );
         break;
 
@@ -1635,7 +1635,7 @@ uint64_t sfz::Region::getOffset(Oversampling factor) const noexcept
     std::uniform_int_distribution<int64_t> offsetDistribution { 0, offsetRandom };
     uint64_t finalOffset = offset + offsetDistribution(Random::randomGenerator);
     for (const auto& mod: offsetCC)
-        finalOffset += static_cast<uint64_t>(mod.data * midiState.getCCValue(mod.cc));
+        finalOffset += static_cast<int64_t>(mod.data * midiState.getCCValue(mod.cc));
     return Default::offset.bounds.clamp(finalOffset) * static_cast<uint64_t>(factor);
 }
 
