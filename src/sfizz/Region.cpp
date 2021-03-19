@@ -1491,7 +1491,7 @@ bool sfz::Region::registerNoteOn(int noteNumber, float velocity, float randValue
         velocity = midiState.getLastVelocity();
 
     const bool velOk = velocityRange.containsWithEnd(velocity);
-    const bool randOk = randRange.contains(randValue) || (randValue == 1.0f && randRange.getEnd() == 1.0f);
+    const bool randOk = randRange.contains(randValue) || (randValue == 1.0f && randRange.getEnd() >= 1.0f);
     const bool firstLegatoNote = (trigger == Trigger::first && midiState.getActiveNotes() == 1);
     const bool attackTrigger = (trigger == Trigger::attack);
     const bool notFirstLegatoNote = (trigger == Trigger::legato && midiState.getActiveNotes() > 1);
@@ -1513,7 +1513,7 @@ bool sfz::Region::registerNoteOff(int noteNumber, float velocity, float randValu
 
     const bool keyOk = keyRange.containsWithEnd(noteNumber);
     const bool velOk = velocityRange.containsWithEnd(velocity);
-    const bool randOk = randRange.contains(randValue);
+    const bool randOk = randRange.contains(randValue) || (randValue == 1.0f && randRange.getEnd() >= 1.0f);
 
     if (!(velOk && keyOk && randOk))
         return false;
