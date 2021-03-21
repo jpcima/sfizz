@@ -7,6 +7,7 @@
 #include "ForeignInstrument.h"
 #include "foreign_instruments/AudioFile.h"
 #include "foreign_instruments/DecentSampler.h"
+#include "foreign_instruments/EXS24.h"
 
 namespace sfz {
 
@@ -14,6 +15,7 @@ InstrumentFormatRegistry::InstrumentFormatRegistry()
     : formats_ {
             &AudioFileInstrumentFormat::getInstance(),
             &DecentSamplerInstrumentFormat::getInstance(),
+            &EXS24InstrumentFormat::getInstance(),
       }
 {
 }

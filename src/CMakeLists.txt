@@ -246,12 +246,14 @@ endif()
 set(SFIZZ_IMPORT_HEADERS
     sfizz/import/ForeignInstrument.h
     sfizz/import/foreign_instruments/AudioFile.h
-    sfizz/import/foreign_instruments/DecentSampler.h)
+    sfizz/import/foreign_instruments/DecentSampler.h
+    sfizz/import/foreign_instruments/EXS24.h)
 
 set(SFIZZ_IMPORT_SOURCES
     sfizz/import/ForeignInstrument.cpp
     sfizz/import/foreign_instruments/AudioFile.cpp
-    sfizz/import/foreign_instruments/DecentSampler.cpp)
+    sfizz/import/foreign_instruments/DecentSampler.cpp
+    sfizz/import/foreign_instruments/EXS24.cpp)
 
 add_library(sfizz_import STATIC)
 add_library(sfizz::import ALIAS sfizz_import)
