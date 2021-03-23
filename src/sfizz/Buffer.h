@@ -307,14 +307,15 @@ private:
     static_assert(Alignment == 0 || Alignment == 4 || Alignment == 8 || Alignment == 16 || Alignment == 32, "Bad alignment value");
     static_assert(TypeAlignment * sizeof(value_type) == Alignment || !std::is_arithmetic<value_type>::value,
                   "The alignment does not appear to be divided by the size of the arithmetic Type");
-    void* align(std::size_t alignment, std::size_t size, void *&ptr, std::size_t &space )
+    void* align(std::size_t alignment, std::size_t size, void *ptr, std::size_t &space )
     {
-        std::uintptr_t pn = reinterpret_cast< std::uintptr_t>( ptr );
-        std::uintptr_t aligned = ( pn + alignment - 1 ) & - alignment;
+        std::uintptr_t pn = reinterpret_cast<std::uintptr_t>(ptr);
+        std::uintptr_t mask = static_cast<std::uintptr_t>(alignment) - 1;
+        std::uintptr_t aligned = ((pn & mask) == 0) ? pn : ((pn + alignment) & ~mask);
         std::size_t padding = aligned - pn;
-        if ( space < size + padding ) return nullptr;
+        if (space < size + padding) return nullptr;
         space -= padding;
-        return ptr = reinterpret_cast< void * >( aligned );
+        return reinterpret_cast<void*>(aligned);
     }
 
     struct deleter {
