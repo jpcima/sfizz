@@ -195,6 +195,12 @@ struct Voice::Impl
      */
     void off(int delay, bool fast = false) noexcept;
 
+    /**
+     * @brief Setup the extended CC values for the voice
+     *
+     */
+    void updateExtendedCCValues() noexcept;
+
     const NumericId<Voice> id_;
     StateListener* stateListener_ = nullptr;
 
@@ -287,6 +293,10 @@ struct Voice::Impl
 
     bool followPower_ { false };
     PowerFollower powerFollower_;
+
+    ExtendedCCValues extendedCCValues_;
+    fast_real_distribution<float> unipolarDist { 0.0f, 1.0f };
+    fast_real_distribution<float> bipolarDist { -1.0f, 1.0f };
 };
 
 Voice::Voice(int voiceNumber, Resources& resources)
@@ -362,6 +372,20 @@ Voice::Impl::Impl(int voiceNumber, Resources& resources)
     getSCurve();
 }
 
+const ExtendedCCValues& Voice::getExtendedCCValues() const noexcept
+{
+    Impl& impl = *impl_;
+    return impl.extendedCCValues_;
+}
+
+void Voice::Impl::updateExtendedCCValues() noexcept
+{
+    extendedCCValues_.unipolar = unipolarDist(Random::randomGenerator);
+    extendedCCValues_.bipolar = bipolarDist(Random::randomGenerator);
+    extendedCCValues_.alternate = resources_.midiState.getAlternateState();
+    extendedCCValues_.noteGate = resources_.midiState.getActiveNotes() > 0 ? 1.0f : 0.0f;
+}
+
 bool Voice::startVoice(Region* region, int delay, const TriggerEvent& event) noexcept
 {
     Impl& impl = *impl_;
@@ -379,6 +403,8 @@ bool Voice::startVoice(Region* region, int delay, const TriggerEvent& event) noe
     }
 
     impl.switchState(State::playing);
+
+    impl.updateExtendedCCValues();
 
     ASSERT(delay >= 0);
     if (delay < 0)

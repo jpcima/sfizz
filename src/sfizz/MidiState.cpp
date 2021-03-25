@@ -24,6 +24,7 @@ void sfz::MidiState::noteOnEvent(int delay, int noteNumber, float velocity) noex
         lastNotePlayed = noteNumber;
         activeNotes++;
         noteStates[noteNumber] = true;
+        alternate = alternate == 0.0f ? 1.0f : 0.0f;
     }
 
 }
