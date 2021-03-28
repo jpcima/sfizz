@@ -109,6 +109,12 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
     case hash("end"):
         sampleEnd = opcode.read(Default::sampleEnd);
         break;
+    case hash("end_oncc&"): // also end_cc&
+        if (opcode.parameters.back() > config::numCCs)
+            return false;
+
+        endCC[opcode.parameters.back()] = opcode.read(Default::sampleEndMod);
+        break;
     case hash("count"):
         sampleCount = opcode.readOptional(Default::sampleCount);
         loopMode = LoopMode::one_shot;
@@ -124,6 +130,18 @@ bool sfz::Region::parseOpcode(const Opcode& rawOpcode)
         break;
     case hash("loop_start"): // also loopstart
         loopRange.setStart(opcode.read(Default::loopStart));
+        break;
+    case hash("loop_start_oncc&"): // also loop_start_cc&
+        if (opcode.parameters.back() > config::numCCs)
+            return false;
+
+        loopStartCC[opcode.parameters.back()] = opcode.read(Default::loopMod);
+        break;
+    case hash("loop_end_oncc&"): // also loop_end_cc&
+        if (opcode.parameters.back() > config::numCCs)
+            return false;
+
+        loopEndCC[opcode.parameters.back()] = opcode.read(Default::loopMod);
         break;
     case hash("loop_crossfade"):
         loopCrossfade = opcode.read(Default::loopCrossfade);
@@ -1751,22 +1769,37 @@ float sfz::Region::getDelay() const noexcept
     return Default::delay.bounds.clamp(finalDelay);
 }
 
-uint32_t sfz::Region::trueSampleEnd(Oversampling factor) const noexcept
+uint32_t sfz::Region::getSampleEnd(Oversampling factor) const noexcept
 {
-    if (sampleEnd <= 0)
-        return 0;
+    int64_t end = sampleEnd;
+    for (const auto& mod: endCC)
+        end += static_cast<int64_t>(mod.data * midiState.getCCValue(mod.cc));
 
-    return static_cast<uint32_t>(sampleEnd) * static_cast<uint32_t>(factor);
+    end = max(int64_t { 0 }, end);
+
+    return static_cast<uint32_t>(end) * static_cast<uint32_t>(factor);
 }
 
 uint32_t sfz::Region::loopStart(Oversampling factor) const noexcept
 {
-    return loopRange.getStart() * static_cast<uint32_t>(factor);
+    auto start = loopRange.getStart();
+    for (const auto& mod: loopStartCC)
+        start += static_cast<int64_t>(mod.data * midiState.getCCValue(mod.cc));
+
+    start = max(int64_t { 0 }, start);
+
+    return static_cast<uint32_t>(start) * static_cast<uint32_t>(factor);
 }
 
 uint32_t sfz::Region::loopEnd(Oversampling factor) const noexcept
 {
-    return loopRange.getEnd() * static_cast<uint32_t>(factor);
+    auto end = loopRange.getEnd();
+    for (const auto& mod: loopEndCC)
+        end += static_cast<int64_t>(mod.data * midiState.getCCValue(mod.cc));
+
+    end = max(int64_t { 0 }, end);
+
+    return static_cast<uint32_t>(end) * static_cast<uint32_t>(factor);
 }
 
 float sfz::Region::getNoteGain(int noteNumber, float velocity) const noexcept
