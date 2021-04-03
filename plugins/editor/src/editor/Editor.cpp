@@ -524,7 +524,7 @@ void Editor::Impl::uiReceiveMessage(const char* path, const char* sig, const sfi
             }
         }
     }
-    else if (Messages::matchOSC("/cc/changed", path, indices) && !strcmp(sig, "b")) {
+    else if (Messages::matchOSC("/cc/changed~", path, indices) && !strcmp(sig, "b")) {
         size_t numBits = 8 * args[0].b->size;
         ConstBitSpan bits { args[0].b->data, numBits };
         for (unsigned cc = 0; cc < numBits; ++cc) {
