@@ -1,6 +1,15 @@
 #!/bin/bash
 set -ex
 
+# Get pluginval
+curl -L "https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_macOS.zip" -o pluginval.zip
+unzip pluginval.zip
+# Validate VST3
+pluginval.app/Contents/MacOS/pluginval --validate-in-process --validate sfizz.vst3
+# Validate AudioUnit
+pluginval.app/Contents/MacOS/pluginval --validate-in-process --validate sfizz.component
+
+# Install to the packaging directory
 make DESTDIR=${PWD}/${INSTALL_DIR} install
 
 # Set bundle icons
