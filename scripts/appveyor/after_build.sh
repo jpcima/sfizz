@@ -1,7 +1,12 @@
 #!/bin/bash
 set -ex
 
-make DESTDIR=${PWD}/${INSTALL_DIR} install
+# Install in the packaging directory
+make DESTDIR="${PWD}/${INSTALL_DIR}" install
+
+# Copy to system, run the AudioUnit validator
+cp -rf "${INSTALL_DIR}"/sfizz.component ~/Library/Audio/Plug-Ins/Components/
+auval -stress -v aumu samp Sfzt
 
 # Set bundle icons
 # Note: disabled, rejected by the code-sign step
@@ -61,7 +66,7 @@ fi
 
 # Only release a tarball if there is a tag
 if [[ ${APPVEYOR_REPO_TAG} ]]; then
-  mv "${INSTALL_DIR}.dmg" ${APPVEYOR_BUILD_FOLDER}
+  mv -f "${INSTALL_DIR}.dmg" "${APPVEYOR_BUILD_FOLDER}/"
 fi
 
 cd ${APPVEYOR_BUILD_FOLDER}
