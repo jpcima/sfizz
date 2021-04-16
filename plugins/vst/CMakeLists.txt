@@ -362,3 +362,31 @@ if(SFIZZ_VST2)
         endif()
     endif()
 endif()
+
+# --- Standalone --- #
+
+if(SFIZZ_JACK)
+    add_executable(sfizz_standalone WIN32
+        "standalone/main.cpp"
+        "standalone/StandaloneWrapper.h"
+        "standalone/StandaloneWrapper.cpp"
+        "standalone/GtkEditorWrapper.h"
+        "standalone/GtkEditorWrapper.cpp"
+        "standalone/JACKWrapper.h"
+        "standalone/JACKWrapper.cpp"
+        "standalone/basewrapper+.h"
+        "standalone/basewrapper+.cpp"
+        "VstPluginFactory.cpp")
+    target_include_directories(sfizz_standalone PRIVATE
+        "${CMAKE_CURRENT_BINARY_DIR}")
+    target_link_libraries(sfizz_standalone PRIVATE
+        sfizz-vst3-core vst3sdk_hosting sfizz::jack)
+    #
+    pkg_check_modules(GTK "gtk+-3.0" REQUIRED)
+    target_include_directories(sfizz_standalone PRIVATE "${GTK_INCLUDE_DIRS}")
+    target_link_libraries(sfizz_standalone PRIVATE "${GTK_LIBRARIES}")
+    link_directories("${GTK_LIBRARY_DIRS}")
+    #
+    plugin_add_vst3sdk(sfizz_standalone)
+    plugin_add_vstgui(sfizz_standalone)
+endif()
